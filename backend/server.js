@@ -7,3 +7,6 @@ app.get('/', (req, res) => {
 app.listen(PUERTO, () => {
     console.log(`Servidor escuchando en el puerto ${PUERTO}`);
 });
+
+const usuarioRoutes = require('./src/routes/usuarioRoutes');
+app.use('/usuarios', usuarioRoutes);
