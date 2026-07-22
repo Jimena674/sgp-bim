@@ -15,7 +15,7 @@ class EstadoUsuario {
 
     //Registrar el cambio de estado
     static async asignarEstado(id_usuario, id_estado, asignado_por) {
-        await pool.query('INSERT INTO estados_usuarios (id_estado, id_usuario, fecha_asignacion, asignado_por) VALUES (?, ?, NOW(), ?)', [id_estado, id_usuario, new Date(), asignado_por]);
+        await pool.query('INSERT INTO estados_usuarios (id_estado, id_usuario, fecha_asignacion, asignado_por) VALUES (?, ?, NOW(), ?)', [id_estado, id_usuario, asignado_por]);
     };
 }
 
