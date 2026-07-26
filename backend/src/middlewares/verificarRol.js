@@ -4,7 +4,7 @@ function verificarRol(rolesPermitidos) {
             return res.status(401).json({error: 'Usuario no autenticado'});
         }
         if(!rolesPermitidos.includes(req.usuario.rol)) {
-            return res.status(403).json({ error: 'No tienes permiso para realiza esta acción.'})
+            return res.status(403).json({ error: 'No tienes permiso para realizar esta acción.'})
         }
         
         next();

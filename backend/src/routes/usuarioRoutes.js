@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const usuarioController = requiere('../controllers/usuarioController');
-const verificarRol = requiere ('../middlewares/verificarRol');
+const usuarioController = require('../controllers/usuarioController');
+const verificarRol = require ('../middlewares/verificarRol');
+const verificarSesion = require ('../middlewares/verificarSesion');
 
-router.post('/', verificarRol(['Administrador']), usuarioController.crearUsuario);
-router.put('/:id', verificarRol(['Administrador']), usuarioController.actualizarUsuario);
-router.delete('/:id', verificarRol(['Administrador']), usuarioController.eliminarUsuario);
-router.get('/', usuarioController.listarUsuarios);
-router.patch('/:id/estado', verificarRol(['Administrador']), usuarioController.cambiarEstadoUsuario);
+router.post('/', verificarSesion, verificarRol(['Administrador']), usuarioController.crearUsuario);
+router.put('/:id', verificarSesion, verificarRol(['Administrador']), usuarioController.actualizarUsuario);
+router.delete('/:id', verificarSesion, verificarRol(['Administrador']), usuarioController.eliminarUsuario);
+router.get('/', verificarSesion, usuarioController.listarUsuarios);
+router.patch('/:id/estado', verificarSesion, verificarRol(['Administrador']), usuarioController.cambiarEstadoUsuario);
 
 module.exports = router;

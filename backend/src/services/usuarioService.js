@@ -109,10 +109,6 @@ class UsuarioService {
             datosLimpios. password = await bcrypt.hash(password, 10);
          }
 
-         //Prueba
-         console.log('Datos que se van a guardar', datosLimpios);
-         await Usuario.actualizar(id, datosLimpios);
-
          //Si toda la validación pasá, se llama al model
          await Usuario.actualizar(id, datosLimpios);
     }
@@ -121,6 +117,8 @@ class UsuarioService {
         const usuario = await Usuario.obtenerPorId(id);
         if (!usuario) throw new Error('Usuario no encontrado.');
 
+        //Falta validar que el usuario no esté asociado a actividades
+        
         await Usuario.eliminar(id)
     }
 
