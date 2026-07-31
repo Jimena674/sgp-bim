@@ -5,7 +5,7 @@ function validarIdentificacion(numero_id) {
 
 function validarUnicidad(registroExistente, campo) {
     if(registroExistente) {
-        throw new Error('Ya existe un registro con este valor: ${campo}');
+        throw new Error(`Ya existe un registro con este valor: ${campo}`);
     }
 }
 

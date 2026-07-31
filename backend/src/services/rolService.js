@@ -1,11 +1,14 @@
 const Rol = require('../models/Rol');
 const PermisoRol = require('../models/PermisoRol');
+const RolUsuario = require('../models/RolUsuario');
+const PermisoRol = require('../models/PermisoRol');
 const {validarUnicidad} = require('../utils/validadores');
 const ErrorConEstado = require('../utils/errores');
+const RolUsuario = require('../models/RolUsuario');
 
 const REGEX_NOMBRE = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{1,40}$/;
 const REGEX_CODIGO = /^[a-z]{1,40}$/;
-const ROLES_CONSULTA_TOTAL = ['Administrador', 'Coordinador', 'Gerente'];
+const PERMISO_CONSULTAR_TODOS = 'consultar_roles';
 
 class RolService {
 
@@ -90,17 +93,17 @@ class RolService {
     }
 
     static async consultarRoles (usuarioSolicitante) {
-        const {id: idSolicitante, rol: rolSolicitante} = usuarioSolicitante;
+        const {id: idSolicitante} = usuarioSolicitante;
 
-        if(ROLES_CONSULTA_TOTAL.includes(rolSolicitante)) {
+        const rolActual = await RolUsuario.obtenerRolActual(idSolicitante);
+        if(!rolActual) return [];
+
+        const puedeConsultarTodos = await PermisoRol.tienePermiso(rolActual.id_rol, PERMISO_CONSULTAR_TODOS);
+        if(puedeConsultarTodos) {
             return await Rol.obtenerTodos();
         }
 
-        const idRolAsignado = await RolUsuario.obtenerIdRolDeUsuario(idSolicitante);
-        if (!idRolAsignado) return [];
-
-                //Falta crear models de RolUsuario
-        const rolPropio = await Rol.obtenerPorId(idRolAsignado);
+        const rolPropio = await Rol.obtenerPorId(rolActual.id_rol);
         if (!rolPropio) return [];
         return [{
             nombre_rol: rolPropio.nombre_rol,

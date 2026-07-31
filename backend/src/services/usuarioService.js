@@ -1,11 +1,15 @@
 const Usuario = require('../models/Usuario');
 const EstadoUsuario = require('../models/EstadoUsuario');
+const Estado = require('../models/Estado');
+const RolUsuario = require('../models/RolUsuario');
+const PermisoRol = require('../models/PermisoRol');
 const bcrypt = require('bcrypt');
 const {validarIdentificacion, validarUnicidad} = require('../utils/validadores');
 
-const ESTADO_ACTIVO = 1;
-const ESTADO_INACTIVO = 2;
-const ROLES_CONSULTA_TOTAL = ['Administrador', 'Coordinador'];
+const CODIGO_ESTADO_ACTIVO = 'ACT';
+const CODIGO_ESTADO_INACTIVO = 'INA';
+const PERMISO_CONSULTAR_TODOS = 'consultar_usuarios';
+const CODIGO_MODULO_USUARIOS = 'usuarios';
 
 const REGEX_NOMBRE = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{1,40}$/;
 const REGEX_PASSWORD = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -57,12 +61,11 @@ class UsuarioService {
         // y se registra fecha de creación y responsable
         const nuevoUsuario = await Usuario.crear({
             ...datosUsuario,
-            password: passwordCifrada,
-            registro_por: idResponsable,
-            fecha_registro: new Date()
+            password: passwordCifrada
         });
 
-        await EstadoUsuario.cambioEstado(nuevoUsuario, ESTADO_ACTIVO, idResponsable);
+        const estadoActivo = await Estado.obtenerPorCodigo(CODIGO_ESTADO_ACTIVO, CODIGO_MODULO_USUARIOS);
+        await EstadoUsuario.asignarEstado(nuevoUsuario, estadoActivo.id_estado, idResponsable);
 
         return nuevoUsuario;
     }
@@ -122,21 +125,26 @@ class UsuarioService {
         await Usuario.eliminar(id)
     }
 
-    static async cambiarEstadoUsuario(id, id_estado, idResponsable) {
+    static async cambiarEstadoUsuario(id, codigo_estado, idResponsable) {
         const usuario = await Usuario.obtenerPorId(id);
         if (!usuario) throw new Error('Usuario no encontrado.');
 
-        if(![ESTADO_ACTIVO, ESTADO_INACTIVO].includes(id_estado)) {
+        if(![CODIGO_ESTADO_ACTIVO, CODIGO_ESTADO_INACTIVO].includes(codigo_estado)) {
             throw new Error('Estado inválido. Solo se permiten los estados activo e inactivo.');
         }
 
-        await EstadoUsuario.asignarEstado(id, id_estado, idResponsable);
+        const estado = await Estado.obtenerPorCodigo(codigo_estado, CODIGO_MODULO_USUARIOS);
+        await EstadoUsuario.asignarEstado(id, estado.id_estado, idResponsable);
     }
 
     static async consultarUsuarios(usuarioSolicitante) {
-        const {id: idSolicitante, rol: rolSolicitante} = usuarioSolicitante;
+        const {id: idSolicitante} = usuarioSolicitante;
 
-        if (ROLES_CONSULTA_TOTAL.includes(rolSolicitante)) {
+        const rolActual = await RolUsuario.obtenerRolActual(idSolicitante);
+        if(!rolActual) return [];
+
+        const puedeConsultarTodos = await PermisoRol.tienePermiso(rolActual.id_rol, PERMISO_CONSULTAR_TODOS);
+        if(puedeConsultarTodos) {
             return await Usuario.obtenerTodos();
         }
 

@@ -22,6 +22,13 @@ class PermisoRol {
         await pool.query('DELETE FROM permisos_roles WHERE id_permiso_rol = ?', [id_permiso_rol]);
     }
 
+    static async tienePermiso(id_rol, codigo_permiso) {
+        const[filas]= await pool.query(
+            'SELECT pr.id_permiso_rol FROM permisos_roles pr INNER JOIN permisos p ON p.id_permiso = pr.id_permiso WHERE pr.id_rol = ? AND p.codigo_permiso = ? AND pr.activo = 1', [id_rol, codigo_permiso]
+        );
+        return filas.length > 0;
+    }
+
 };
 
 module.exports = PermisoRol;

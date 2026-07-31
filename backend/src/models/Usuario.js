@@ -10,7 +10,7 @@ class Usuario {
 
     //Obtener por id
     static async obtenerPorId(id) {
-        const [filas] = await pool.query('SELECT *FROM usuarios WHERE id_usuario = ?', [id]);
+        const [filas] = await pool.query('SELECT * FROM usuarios WHERE id_usuario = ?', [id]);
         return filas[0];
     }
 
