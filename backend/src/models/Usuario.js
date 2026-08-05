@@ -32,11 +32,6 @@ class Usuario {
         await pool.query(`UPDATE usuarios SET ${asignaciones} WHERE id_usuario = ?`, [...valores, id]);
     }
 
-    //Eliminar un usuario
-    static async eliminar(id) {
-        await pool.query('DELETE FROM usuarios WHERE id_usuario=?', [id]);
-    }
-
     //Obtener un usuario por su correo
     static async obtenerPorCorreo(correo) {
         const [filas] = await pool.query('SELECT * FROM usuarios WHERE correo = ?', [correo]);

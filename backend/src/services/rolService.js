@@ -1,10 +1,8 @@
 const Rol = require('../models/Rol');
 const PermisoRol = require('../models/PermisoRol');
 const RolUsuario = require('../models/RolUsuario');
-const PermisoRol = require('../models/PermisoRol');
 const {validarUnicidad} = require('../utils/validadores');
 const ErrorConEstado = require('../utils/errores');
-const RolUsuario = require('../models/RolUsuario');
 
 const REGEX_NOMBRE = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{1,40}$/;
 const REGEX_CODIGO = /^[a-z]{1,40}$/;
@@ -24,14 +22,14 @@ class RolService {
         }
 
         if (!REGEX_CODIGO.test(codigo_rol)) {
-            throw new Error('El código solo puede contener letras minúsculas y máximo 40 caracteres. No se permite tíldes o "ñ".');
+            throw new Error('El código solo puede contener letras minúsculas y máximo 40 caracteres. No se permite tildes o ñ.');
         }
 
         const nombreExistente = await Rol.obtenerPorNombre(nombre_rol);
-        validarUnicidad(nombreExistente, 'nombre_rol');
+        validarUnicidad(nombreExistente, nombre_rol);
 
         const codigoExistente = await Rol.obtenerPorCodigo(codigo_rol);
-        validarUnicidad(codigoExistente, 'codigo_rol');
+        validarUnicidad(codigoExistente, codigo_rol);
 
         const nuevoRol = await Rol.registrar(datosRol);
         return nuevoRol;
@@ -82,11 +80,11 @@ class RolService {
 
     static async eliminarRol (id) {
         const rol = await Rol.obtenerPorId(id);
-        if (!rol) throw new ErrorConEstado ('Rol no encontrado.', 404);
+        if (!rol) throw new Error('Rol no encontrado.', 404);
 
         const totalUsuarios = await Rol.contarUsuariosAsociados(id);
         if (totalUsuarios > 0) {
-            throw new ErrorConEstado('No se puede eliminar el rol porque tienen usuarios asociados.', 409);
+            throw new Error('No se puede eliminar el rol porque tiene usuarios asociados.', 409);
         }
 
         await Rol.eliminar(id);

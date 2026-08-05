@@ -8,7 +8,7 @@ class PermisoRol {
 
     static async obtenerPermisosPorRol (id_rol) {
         const [filas] = await pool.query(
-            `SELECT pr.id_permiso_rol, p.nombre_permiso FROM permisos_roles pr INNER JOIN permisos p ON p.id_permiso = pr.id_permiso WHERE pr.id_rol = ?`, [id_rol]
+            `SELECT pr.id_permiso_rol, p.nombre_permiso FROM permisos_roles pr INNER JOIN permisos p ON p.id_permiso = pr.id_permiso WHERE pr.id_rol = ? AND pr.activo = 1`, [id_rol]
         );
         return filas;
     }
@@ -18,15 +18,16 @@ class PermisoRol {
         return filas;
     }
 
-    static async eliminarPermiso (id_permiso_rol) {
-        await pool.query('DELETE FROM permisos_roles WHERE id_permiso_rol = ?', [id_permiso_rol]);
-    }
-
     static async tienePermiso(id_rol, codigo_permiso) {
         const[filas]= await pool.query(
             'SELECT pr.id_permiso_rol FROM permisos_roles pr INNER JOIN permisos p ON p.id_permiso = pr.id_permiso WHERE pr.id_rol = ? AND p.codigo_permiso = ? AND pr.activo = 1', [id_rol, codigo_permiso]
         );
         return filas.length > 0;
+    }
+
+    static async revocarPermiso(id_permiso_rol, asignado_por) {
+        await pool.query('UPDATE permisos_roles SET activo = 0, fecha_asignacion = NOW(), asignado_por = ? WHERE id_permiso_rol = ?', [id_permiso_rol, asignado_por]
+        );
     }
 
 };

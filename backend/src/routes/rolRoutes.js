@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const rolController = require('../controllers/rolController');
-const verificarRol = require('../middlewares/verificarRol');
+const verificarPermiso = require('../middlewares/verificarPermiso');
 const verificarSesion = require('../middlewares/verificarSesion');
 
-router.post('/', verificarSesion, verificarRol(['Administrador']), rolController.registrarRol);
+router.post('/', verificarSesion, verificarPermiso('gestionar_roles'), rolController.registrarRol);
 router.get('/', verificarSesion, rolController.consultarRoles);
-router.put('/:id', verificarSesion, verificarRol(['Administrador']), rolController.actualizarRol);
-router.delete('/:id', verificarSesion, verificarRol(['Administrador']), rolController.eliminarRol);
+router.put('/:id', verificarSesion, verificarPermiso('gestionar_roles'), rolController.actualizarRol);
+router.delete('/:id', verificarSesion, verificarPermiso('gestionar_roles'), rolController.eliminarRol);
 
 module.exports = router;

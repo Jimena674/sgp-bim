@@ -5,7 +5,7 @@ async function registrarRol (req, res) {
         const idNuevoRol = await RolService.registrarRol(req.body);
         res.status(201).json({mensaje: 'Rol creado exitosamente.', id: idNuevoRol});
     } catch (error) {
-        res.status(400).json({error: error.message});
+        res.status(error.estado || 400).json({error: error.message});
     }
 }
 
@@ -32,7 +32,7 @@ async function consultarRoles(req, res) {
         const roles = await RolService.consultarRoles(req.usuario);
         res.json(roles);
     } catch (error) {
-        res.status(400).json({error: error.message});
+        res.status(error.estado || 400).json({error: error.message});
     }
 }
 

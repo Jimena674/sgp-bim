@@ -48,11 +48,11 @@ class UsuarioService {
 
         //Regla: correo único
         const correoExistente = await Usuario.obtenerPorCorreo(correo);
-        validarUnicidad(correoExistente, 'correo');
+        validarUnicidad(correoExistente, correo);
 
         //Regla: identificación única
         const numeroIdExistente = await Usuario.obtenerPorNumeroId(numero_id);
-        validarUnicidad(numeroIdExistente, 'numero_id');
+        validarUnicidad(numeroIdExistente, numero_id);
 
         //Regla: contraseña se almacena cifrada
         const passwordCifrada = await bcrypt.hash(password, 10);
@@ -72,7 +72,7 @@ class UsuarioService {
 
     static async actualizarUsuario(id, datosUsuario) {
         const usuario = await Usuario.obtenerPorId(id);
-        if (!usuario) throw new Error('Usuario no encontrado.');
+        if (!usuario) throw new Error('Usuario no encontrado.', 404);
 
         //filtrar solo los campos permitidos
         const camposPermitidos = ['nombre_usuario', 'id_tipo', 'numero_id', 'correo', 'telefono', 'password'];
@@ -116,25 +116,16 @@ class UsuarioService {
          await Usuario.actualizar(id, datosLimpios);
     }
 
-    static async eliminarUsuario(id) {
-        const usuario = await Usuario.obtenerPorId(id);
-        if (!usuario) throw new Error('Usuario no encontrado.');
-
-        //Falta validar que el usuario no esté asociado a actividades
-        
-        await Usuario.eliminar(id)
-    }
-
     static async cambiarEstadoUsuario(id, codigo_estado, idResponsable) {
         const usuario = await Usuario.obtenerPorId(id);
-        if (!usuario) throw new Error('Usuario no encontrado.');
+        if (!usuario) throw new Error('Usuario no encontrado.', 404);
 
         if(![CODIGO_ESTADO_ACTIVO, CODIGO_ESTADO_INACTIVO].includes(codigo_estado)) {
             throw new Error('Estado inválido. Solo se permiten los estados activo e inactivo.');
         }
 
         const estado = await Estado.obtenerPorCodigo(codigo_estado, CODIGO_MODULO_USUARIOS);
-        await EstadoUsuario.asignarEstado(id, estado.id_estado, idResponsable);
+        await EstadoUsuario.asignarEstado(id, estado.id_estado, idResponsable); 
     }
 
     static async consultarUsuarios(usuarioSolicitante) {
