@@ -43,5 +43,15 @@ class Usuario {
         const [filas] = await pool.query('SELECT * FROM usuarios WHERE numero_id = ?', [numero_id]);
         return filas[0];
     }
+
+    static async registrarIntentoFallido(id_usuario, intentos_fallidos){
+        const [resultado] = await pool.query('UPDATE usuarios SET intentos_fallidos = ?, fecha_ultimo_intento = NOW() WHERE id_usuario = ?', [intentos_fallidos, id_usuario]);
+        return resultado.affectedRows > 0;
+    }
+
+    static async reiniciarIntentosFallidos(id_usuario){
+        const [resultado] = await pool.query('UPDATE usuarios SET intentos_fallidos = 0 WHERE id_usuario = ?', [id_usuario]);
+        return resultado.affectedRows > 0;
+    }
 }
 module.exports=Usuario;

@@ -5,11 +5,10 @@ const RolUsuario = require('../models/RolUsuario');
 const PermisoRol = require('../models/PermisoRol');
 const bcrypt = require('bcrypt');
 const {validarIdentificacion, validarUnicidad} = require('../utils/validadores');
+const {COD_MOD_USUARIOS} = require('../utils/constantesModulos');
+const {EST_USUARIO_ACTIVO, EST_USUARIO_INACTIVO} = require('../utils/constantesEstados');
 
-const CODIGO_ESTADO_ACTIVO = 'ACT';
-const CODIGO_ESTADO_INACTIVO = 'INA';
 const PERMISO_CONSULTAR_TODOS = 'consultar_usuarios';
-const CODIGO_MODULO_USUARIOS = 'usuarios';
 
 const REGEX_NOMBRE = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{1,40}$/;
 const REGEX_PASSWORD = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -64,7 +63,7 @@ class UsuarioService {
             password: passwordCifrada
         });
 
-        const estadoActivo = await Estado.obtenerPorCodigo(CODIGO_ESTADO_ACTIVO, CODIGO_MODULO_USUARIOS);
+        const estadoActivo = await Estado.obtenerPorCodigo(EST_USUARIO_ACTIVO, COD_MOD_USUARIOS);
         await EstadoUsuario.asignarEstado(nuevoUsuario, estadoActivo.id_estado, idResponsable);
 
         return nuevoUsuario;
@@ -120,11 +119,11 @@ class UsuarioService {
         const usuario = await Usuario.obtenerPorId(id);
         if (!usuario) throw new Error('Usuario no encontrado.', 404);
 
-        if(![CODIGO_ESTADO_ACTIVO, CODIGO_ESTADO_INACTIVO].includes(codigo_estado)) {
+        if(![EST_USUARIO_ACTIVO, EST_USUARIO_INACTIVO].includes(codigo_estado)) {
             throw new Error('Estado inválido. Solo se permiten los estados activo e inactivo.');
         }
 
-        const estado = await Estado.obtenerPorCodigo(codigo_estado, CODIGO_MODULO_USUARIOS);
+        const estado = await Estado.obtenerPorCodigo(codigo_estado, COD_MOD_USUARIOS);
         await EstadoUsuario.asignarEstado(id, estado.id_estado, idResponsable); 
     }
 
