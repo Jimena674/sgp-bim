@@ -70,7 +70,7 @@ class SesionService {
             jwt_id: jti
          });
 
-         return {token, id_sesion};
+         return {token, id_sesion, nombre_usuario: usuario.nombre_usuario};
 
     }
 

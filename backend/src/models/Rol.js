@@ -23,8 +23,8 @@ class Rol {
     }
 
     static async registrar (datosRol) {
-        const {nombre_rol, codigo_rol, descripcion_rol} = datosRol;
-        const [resultado] = await pool.query('INSERT INTO roles (nombre_rol, codigo_rol, descripcion_rol) VALUES (?, ?, ?)', [nombre_rol, codigo_rol, descripcion_rol]);
+        const {nombre_rol, codigo_rol, descripcion_rol, bg_color} = datosRol;
+        const [resultado] = await pool.query('INSERT INTO roles (nombre_rol, codigo_rol, descripcion_rol, bg_color) VALUES (?, ?, ?, ?)', [nombre_rol, codigo_rol, descripcion_rol, bg_color]);
         return resultado.insertId;
     }
 

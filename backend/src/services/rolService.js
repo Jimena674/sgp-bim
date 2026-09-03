@@ -7,6 +7,7 @@ const ErrorConEstado = require('../utils/errores');
 const REGEX_NOMBRE = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{1,40}$/;
 const REGEX_CODIGO = /^[a-z]{1,40}$/;
 const PERMISO_CONSULTAR_TODOS = 'consultar_roles';
+const REGEX_COLOR_HEX = /^#[0-9A-Fa-f]{6}$/;
 
 class RolService {
 
@@ -23,6 +24,10 @@ class RolService {
 
         if (!REGEX_CODIGO.test(codigo_rol)) {
             throw new Error('El código solo puede contener letras minúsculas y máximo 40 caracteres. No se permite tildes o ñ.');
+        }
+
+        if(datosRol.bg_color && !REGEX_COLOR_HEX.test(datosRol.bg_color)) {
+            throw new Error('El color debe estar en formato hexadecimal, ejemplo: #1B364E.');
         }
 
         const nombreExistente = await Rol.obtenerPorNombre(nombre_rol);

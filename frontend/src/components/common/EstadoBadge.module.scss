@@ -1,0 +1,11 @@
+@import '../../assets/styles/variables';
+
+.estadoActivo {
+  background-color: $estado-activo-bg;
+  color: $estado-activo-text;
+}
+
+.estadoInactivo {
+  background-color: $estado-inactivo-bg;
+  color: $estado-inactivo-text;
+}

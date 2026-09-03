@@ -3,7 +3,7 @@ const SesionService = require('../services/sesionService');
 async function login(req,res){
     try {
         const resultado = await SesionService.login(req.body.numero_id, req.body.password, req.ip);
-        res.json({mensaje:'Ha iniciado sesión de manera exitosa.', token: resultado.token});
+        res.json({mensaje:'Ha iniciado sesión de manera exitosa.', token: resultado.token, nombre_usuario: resultado.nombre_usuario});
     } catch(error) {
         res.status(error.estado || 400).json({error:error.message});
     }

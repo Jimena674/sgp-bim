@@ -1,0 +1,22 @@
+// Fondo general y superficies
+$body-bg: #0B0F18;
+$body-color: #E4E7EC;
+
+// Sidebar / topbar (más oscuro que el fondo general)
+$sidebar-bg: #0D1019;
+$topbar-bg: #0D1019;
+
+// Acento primario (botones activos, tab seleccionada)
+$primary: #3B82F6;
+$primary-hover: #2563EB;
+
+// Superficies "card" (login card, contenedores)
+$card-bg: #161D27;
+$border-color: #1F2733;
+
+// Estados (para badges — no confundir con los $success/$danger de Bootstrap,
+// estos son específicos del negocio: estado ACTIVO/INACTIVO de usuario)
+$estado-activo-bg: #18563D;
+$estado-activo-text: #4ADE80;
+$estado-inactivo-bg: #4C1D1D;
+$estado-inactivo-text: #F87171;

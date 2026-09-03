@@ -1,0 +1,12 @@
+.sidebar {
+  background-color: $sidebar-bg;
+  width: 220px;
+  min-height: 100vh;
+  color: #8B93A1; // texto inactivo, más apagado que el texto principal
+
+  .itemActivo {
+    background-color: rgba($primary, 0.15);
+    color: $primary;
+    border-left: 3px solid $primary;
+  }
+}
