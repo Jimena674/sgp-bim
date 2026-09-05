@@ -2,7 +2,7 @@ const Rol = require('../models/Rol');
 const PermisoRol = require('../models/PermisoRol');
 const RolUsuario = require('../models/RolUsuario');
 const {validarUnicidad} = require('../utils/validadores');
-const ErrorConEstado = require('../utils/errores');
+const {ErrorConEstado} = require('../utils/errores');
 
 const REGEX_NOMBRE = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{1,40}$/;
 const REGEX_CODIGO = /^[a-z]{1,40}$/;
@@ -44,7 +44,7 @@ class RolService {
 
         //Validar que existe el rol
         const rol = await Rol.obtenerPorId(id);
-        if (!rol) throw new ErrorConEstado ('Rol no encontrado.', 404);
+        if (!rol) throw new ErrorConEstado('Rol no encontrado.', 404);
         
         //Limpiar los campos que se pueden actualizar
         const camposPermitidos = ['nombre_rol', 'codigo_rol', 'descripcion_rol'];
@@ -89,7 +89,7 @@ class RolService {
 
         const totalUsuarios = await Rol.contarUsuariosAsociados(id);
         if (totalUsuarios > 0) {
-            throw new Error('No se puede eliminar el rol porque tiene usuarios asociados.', 409);
+            throw new ErrorConEstado('No se puede eliminar el rol porque tiene usuarios asociados.', 409);
         }
 
         await Rol.eliminar(id);

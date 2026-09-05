@@ -1,0 +1,12 @@
+@import '../../../assets/styles/variables';
+
+.boton {
+  width: 28px; height: 28px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background-color: $card-bg; border: 1px solid $border-color; border-radius: 5px;
+  color: $text-muted; font-size: 0.8rem; cursor: pointer;
+  transition: color 0.15s, background-color 0.15s;
+
+  &:hover:not(:disabled) { color: $body-color; background-color: #1E2A38; }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}

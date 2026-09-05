@@ -24,7 +24,7 @@ async function verificarSesion(req, res, next) {
         const minutosInactiva = (Date.now() - new Date(sesion.fecha_ultima_actividad)) / 60000;
         if (minutosInactiva > 20) {
             const estadoTimeout = await Estado.obtenerPorCodigo(EST_SESION_CERRADA_TIMEOUT, COD_MOD_SESIONES)
-            await Sesion.cierrePorTimeout(sesion.id_sesion, estadoTimeout.id_estado);
+            await Sesion.cerrarSesion(sesion.id_sesion, estadoTimeout.id_estado);
             return res.status(401).json({error: 'Sesión cerrada por inactividad.'});
         }
 

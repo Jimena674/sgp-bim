@@ -42,9 +42,9 @@ class SesionService {
             throw new errores.ErrorConEstado('Contraseña inválida.', 401);
          }
 
-         const roles = await RolUsuario.obtenerRolActual(usuario.id_usuario);
-         if(roles.length === 0) {
-            throw new errores.ErrorConEstado('Usuario sin roles asignados no puede iniciar sesión.', 403);
+         const rol = await RolUsuario.obtenerRolActual(usuario.id_usuario);
+         if(!rol) {
+            throw new errores.ErrorConEstado('Un usuario sin rol asignado no puede iniciar sesión.', 403);
          }
 
          await Usuario.reiniciarIntentosFallidos(usuario.id_usuario);

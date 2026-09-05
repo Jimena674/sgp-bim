@@ -1,0 +1,12 @@
+@import '../../../assets/styles/variables';
+
+.contenedor { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; border-top: 1px solid $border-color; }
+.info { font-size: 0.73rem; color: $text-muted; }
+.controles { display: flex; align-items: center; gap: 6px; }
+.boton {
+  min-width: 26px; height: 26px; background-color: $card-bg; border: 1px solid $border-color;
+  border-radius: 4px; color: $text-muted; font-size: 0.8rem; cursor: pointer;
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+  &:hover:not(:disabled) { background-color: #1E2A38; color: $body-color; }
+}
+.actual { font-size: 0.78rem; color: $body-color; min-width: 20px; text-align: center; }

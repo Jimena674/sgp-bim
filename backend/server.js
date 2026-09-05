@@ -10,9 +10,9 @@ const app = express();
 
 app.use(express.json());
 
-app.use('/usuarios', usuarioRoutes);
-app.use('/roles', rolRoutes);
-app.use('/auth', sesionRoutes);
+app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/roles', rolRoutes);
+app.use('/api/auth', sesionRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

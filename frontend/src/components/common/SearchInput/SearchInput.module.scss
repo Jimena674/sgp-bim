@@ -1,0 +1,9 @@
+@import '../../../assets/styles/variables';
+
+.grupo { display: flex; align-items: center; background-color: #0D1117; border: 1px solid $border-color; border-radius: 6px; overflow: hidden; }
+.icono { padding: 0 8px; color: $text-muted; font-size: 0.8rem; }
+.input {
+  background: transparent; border: none; outline: none; color: $body-color;
+  font-size: 0.82rem; padding: 6px 8px 6px 0; width: 100%;
+  &::placeholder { color: #3D4F65; }
+}

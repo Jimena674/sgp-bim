@@ -1,0 +1,6 @@
+@import '../../../assets/styles/variables';
+
+.toast { background-color: $card-bg; border: 1px solid $border-color; border-radius: 8px; font-size: 0.8rem; }
+.cuerpo { padding: 10px 14px; color: $body-color; }
+.ok { color: #4AC78B; }
+.error { color: #E05C5C; }

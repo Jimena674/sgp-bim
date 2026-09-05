@@ -16,7 +16,21 @@ $border-color: #1F2733;
 
 // Estados (para badges — no confundir con los $success/$danger de Bootstrap,
 // estos son específicos del negocio: estado ACTIVO/INACTIVO de usuario)
-$estado-activo-bg: #18563D;
-$estado-activo-text: #4ADE80;
-$estado-inactivo-bg: #4C1D1D;
-$estado-inactivo-text: #F87171;
+$estado-activo-bg: #18563D;       $estado-activo-text: #4ADE80;
+$estado-inactivo-bg: #4C1D1D;     $estado-inactivo-text: #F87171;
+
+$estado-proceso-bg: #1B3D5C;      $estado-proceso-text: #4A90D9;
+$estado-finalizado-bg: #1A3D2E;   $estado-finalizado-text: #4AC78B;
+$estado-retrasado-bg: #3D2510;    $estado-retrasado-text: #E07A3A;
+$estado-suspendido-bg: #2E2215;   $estado-suspendido-text: #C9924A;
+$estado-pendiente-bg: #262630;    $estado-pendiente-text: #8F8FCF;
+$estado-cancelado-bg: #2D1B1B;    $estado-cancelado-text: #E05C5C;
+
+$estado-analisis-bg: #2E2215;     $estado-analisis-text: #C9924A;
+$estado-aprobado-bg: #1A3D2E;     $estado-aprobado-text: #4AC78B;
+$estado-rechazado-bg: #2D1B1B;    $estado-rechazado-text: #E05C5C;
+$estado-cerrado-bg: #1E2A38;      $estado-cerrado-text: #8B93A1;
+
+$estado-default-bg: #1E2A38;      $estado-default-text: #8B93A1;
+
+$text-muted: #8B93A1;

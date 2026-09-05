@@ -1,0 +1,9 @@
+@import '../../../assets/styles/variables';
+
+.card { background-color: $card-bg; border: 1px solid $border-color; border-radius: 8px; padding: 18px 20px; }
+.label { font-size: 0.72rem; color: $text-muted; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.value { font-size: 1.6rem; font-weight: 700; color: #fff; line-height: 1; }
+.sub { font-size: 0.73rem; color: $text-muted; margin-top: 4px; }
+.accent { color: $primary; }
+.warn { color: #E0A24A; }
+.ok { color: #4AC78B; }

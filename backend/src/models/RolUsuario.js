@@ -9,12 +9,12 @@ class RolUsuario {
 
     static async asignarRol(id_usuario, id_rol, asignado_por) {
         await pool.query(
-            'INSERT INTO roles_usuarios (id_rol, id_usuario, fecha_asignacion, asignado_por) VALUES (?, ?, NOW()),  ?', [id_rol, id_usuario, asignado_por]
+            'INSERT INTO roles_usuarios (id_rol, id_usuario, fecha_asignacion, asignado_por) VALUES (?, ?, NOW(), ?)', [id_rol, id_usuario, asignado_por]
         );
     }
 
     static async revocarRol(id_usuario, id_rol){
-        await pool.query(
+        const [resultado] = await pool.query(
             'UPDATE roles_usuarios SET activo = FALSE WHERE id_usuario = ? AND id_rol = ?', [id_usuario, id_rol]
         );
         return resultado.affectedRows > 0;

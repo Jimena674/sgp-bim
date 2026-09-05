@@ -1,0 +1,6 @@
+@import '../../../assets/styles/variables';
+
+.pista { height: 4px; background-color: $border-color; border-radius: 2px; overflow: hidden; min-width: 60px; }
+.barra { height: 100%; border-radius: 2px; background-color: $primary; }
+.warn { background-color: #E0A24A; }
+.ok { background-color: #4AC78B; }

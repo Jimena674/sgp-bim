@@ -1,0 +1,22 @@
+@import '../../../assets/styles/variables';
+
+.badge {
+  font-weight: 600;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.activo      { background-color: $estado-activo-bg;      color: $estado-activo-text; }
+.inactivo    { background-color: $estado-inactivo-bg;    color: $estado-inactivo-text; }
+.proceso     { background-color: $estado-proceso-bg;     color: $estado-proceso-text; }
+.finalizado  { background-color: $estado-finalizado-bg;  color: $estado-finalizado-text; }
+.retrasado   { background-color: $estado-retrasado-bg;   color: $estado-retrasado-text; }
+.suspendido  { background-color: $estado-suspendido-bg;  color: $estado-suspendido-text; }
+.pendiente   { background-color: $estado-pendiente-bg;   color: $estado-pendiente-text; }
+.cancelado   { background-color: $estado-cancelado-bg;   color: $estado-cancelado-text; }
+.analisis    { background-color: $estado-analisis-bg;    color: $estado-analisis-text; }
+.aprobado    { background-color: $estado-aprobado-bg;    color: $estado-aprobado-text; }
+.rechazado   { background-color: $estado-rechazado-bg;   color: $estado-rechazado-text; }
+.cerrado     { background-color: $estado-cerrado-bg;     color: $estado-cerrado-text; }
+.default     { background-color: $estado-default-bg;     color: $estado-default-text; }

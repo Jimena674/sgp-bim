@@ -1,0 +1,64 @@
+@import '../../assets/styles/variables';
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 230px;
+  right: 0;
+  height: 56px;
+  background-color: $topbar-bg;
+  border-bottom: 1px solid $border-color;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  z-index: 1030;
+}
+
+.titulo {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.breadcrumb {
+  font-size: 0.78rem;
+  color: #8b93a1;
+}
+
+.acciones {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.iconBtn {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  background-color: $card-bg;
+  border: 1px solid $border-color;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b93a1;
+  cursor: pointer;
+
+  &:hover {
+    color: $body-color;
+    background-color: #1e2a38;
+  }
+}
+
+.puntoAlerta {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 7px;
+  height: 7px;
+  background-color: #e05c5c;
+  border-radius: 50%;
+  border: 1px solid $topbar-bg;
+}

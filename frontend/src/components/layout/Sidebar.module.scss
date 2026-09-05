@@ -1,12 +1,113 @@
-.sidebar {
-  background-color: $sidebar-bg;
-  width: 220px;
-  min-height: 100vh;
-  color: #8B93A1; // texto inactivo, más apagado que el texto principal
+@import '../../assets/styles/variables';
 
-  .itemActivo {
-    background-color: rgba($primary, 0.15);
-    color: $primary;
-    border-left: 3px solid $primary;
+.sidebar {
+  position:fixed;
+  top:0;
+  left:0;
+  width:230px;
+  height:100vh;
+  background-color: $sidebar-bg;
+  border-right:ipx solid $border-color;
+  display:flex;
+  flex-direction: column;
+  z-index:1040;
+}
+
+.marca {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 18px;
+  border-bottom: 1px solid $border-color;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.iconoMarca {
+  width: 30px;
+  height: 30px;
+  background-color: $primary;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.navScroll {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.etiquetaSeccion {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8b93a1;
+  padding: 14px 18px 4px;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 18px;
+  color: #8b93a1;
+  font-size: 0.825rem;
+  text-decoration: none;
+  border-left: 3px solid transparent;
+
+  &:hover {
+    background-color: $card-bg;
+    color: $body-color;
   }
+}
+
+.activo {
+  background-color: rgba($primary, 0.15);
+  color: $primary;
+  border-left-color: $primary;
+}
+
+.footer {
+  padding: 12px 18px;
+  border-top: 1px solid $border-color;
+}
+
+.userPill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  background-color: $primary;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.userInfo {
+  flex: 1;
+  overflow: hidden;
+}
+
+.userNombre {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: $body-color;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

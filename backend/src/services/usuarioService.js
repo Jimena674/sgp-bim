@@ -3,6 +3,7 @@ const EstadoUsuario = require('../models/EstadoUsuario');
 const Estado = require('../models/Estado');
 const RolUsuario = require('../models/RolUsuario');
 const PermisoRol = require('../models/PermisoRol');
+const errores = require('../utils/errores');
 const bcrypt = require('bcrypt');
 const {validarIdentificacion, validarUnicidad} = require('../utils/validadores');
 const {COD_MOD_USUARIOS} = require('../utils/constantesModulos');
@@ -71,7 +72,7 @@ class UsuarioService {
 
     static async actualizarUsuario(id, datosUsuario) {
         const usuario = await Usuario.obtenerPorId(id);
-        if (!usuario) throw new Error('Usuario no encontrado.', 404);
+        if (!usuario) throw new errores.ErrorConEstado('Usuario no encontrado.', 404);
 
         //filtrar solo los campos permitidos
         const camposPermitidos = ['nombre_usuario', 'id_tipo', 'numero_id', 'correo', 'telefono', 'password'];
@@ -87,7 +88,7 @@ class UsuarioService {
         //validaciones
 
         if(nombre_usuario && !REGEX_NOMBRE.test(nombre_usuario)) {
-            throw new Error ('El nombre solo puede contener letras y máximo 40 caracteres.');
+            throw new Error('El nombre solo puede contener letras y máximo 40 caracteres.');
         }
 
         if(numero_id) {
@@ -117,7 +118,7 @@ class UsuarioService {
 
     static async cambiarEstadoUsuario(id, codigo_estado, idResponsable) {
         const usuario = await Usuario.obtenerPorId(id);
-        if (!usuario) throw new Error('Usuario no encontrado.', 404);
+        if (!usuario) throw new errores.ErrorConEstado('Usuario no encontrado.', 404);
 
         if(![EST_USUARIO_ACTIVO, EST_USUARIO_INACTIVO].includes(codigo_estado)) {
             throw new Error('Estado inválido. Solo se permiten los estados activo e inactivo.');
