@@ -30,7 +30,8 @@ async function cambiarEstadoUsuario (req, res) {
 
 async function listarUsuarios (req, res) {
     try {
-        const usuarios = await UsuarioService.consultarUsuarios(req.usuario);
+        const {pagina,tamano} = req.query;
+        const usuarios = await UsuarioService.consultarUsuarios(req.usuario, {pagina, tamano});
         res.json(usuarios);
     } catch (error) {
         res.status(error.estado || 400).json({ error: error.message});

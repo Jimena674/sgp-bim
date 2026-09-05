@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { ejecutarConsultaPaginada } = require('../utils/consultaPaginada');
 
 class Usuario {
 
@@ -6,6 +7,12 @@ class Usuario {
     static async obtenerTodos() {
         const [filas] = await pool.query('SELECT * FROM usuarios');
         return filas;
+    }
+
+    static async obtenerTodosPaginado(tamano, offset) {
+        const queryDatos = 'SELECT * FROM usuarios LIMIT ? OFFSET ?';
+        const queryConteo = 'SELECT COUNT(*) AS total FROM usuarios';
+        return ejecutarConsultaPaginada(pool, queryDatos, queryConteo, [], tamano, offset);
     }
 
     //Obtener por id

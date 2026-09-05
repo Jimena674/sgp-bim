@@ -6,6 +6,7 @@ const PermisoRol = require('../models/PermisoRol');
 const errores = require('../utils/errores');
 const bcrypt = require('bcrypt');
 const {validarIdentificacion, validarUnicidad} = require('../utils/validadores');
+const {normalizarPaginacion, respuestaPaginada} = require('../utils/paginacion');
 const {COD_MOD_USUARIOS} = require('../utils/constantesModulos');
 const {EST_USUARIO_ACTIVO, EST_USUARIO_INACTIVO} = require('../utils/constantesEstados');
 
@@ -128,19 +129,22 @@ class UsuarioService {
         await EstadoUsuario.asignarEstado(id, estado.id_estado, idResponsable); 
     }
 
-    static async consultarUsuarios(usuarioSolicitante) {
+    static async consultarUsuarios(usuarioSolicitante, filtros = {}) {
         const {id: idSolicitante} = usuarioSolicitante;
+        const {pagina, tamano, offset} = normalizarPaginacion(filtros.pagina, filtros.tamano);
 
         const rolActual = await RolUsuario.obtenerRolActual(idSolicitante);
         if(!rolActual) return [];
 
         const puedeConsultarTodos = await PermisoRol.tienePermiso(rolActual.id_rol, PERMISO_CONSULTAR_TODOS);
         if(puedeConsultarTodos) {
-            return await Usuario.obtenerTodos();
+            const {filas, total} = await Usuario.obtenerTodosPaginado(tamano, offset);
+            return respuestaPaginada(filas, total, pagina, tamano);
         }
 
         const usuarioPropio = await Usuario.obtenerPorId(idSolicitante);
-        return usuarioPropio ? [usuarioPropio] : [];
+        const filas = usuarioPropio ? [usuarioPropio] : [];
+        return respuestaPaginada(filas, filas.length, pagina, tamano);
     }
 }
 
