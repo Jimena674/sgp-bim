@@ -3,7 +3,15 @@ const pool = require ('../config/db');
 class PermisoRol {
 
     static async asignarPermiso (id_rol, id_permiso, asignado_por) {
-        await pool.query('INSERT INTO permisos_roles (id_permiso, id_rol, fecha_asignacion, asignado_por) VALUES (?, ?, NOW(), ?)', [id_permiso, id_rol, asignado_por]);
+        const [resultado] = await pool.query('INSERT INTO permisos_roles (id_permiso, id_rol, fecha_asignacion, asignado_por, activo) VALUES (?, ?, NOW(), ?, TRUE)', [id_permiso, id_rol, asignado_por]);
+        return resultado.insertId;
+    }
+
+    static async obtenerAsignacionActiva (id_rol, id_permiso){
+        const [filas] = await pool.query(
+            'SELECT id_permiso_rol FROM permisos_roles WHERE id_rol= ? AND id_permiso = ? AND activo = 1', [id_rol, id_permiso]
+        );
+        return filas[0];
     }
 
     static async obtenerPermisosPorRol (id_rol) {
@@ -25,11 +33,12 @@ class PermisoRol {
         return filas.length > 0;
     }
 
-    static async revocarPermiso(id_permiso_rol, asignado_por) {
-        await pool.query('UPDATE permisos_roles SET activo = 0, fecha_asignacion = NOW(), asignado_por = ? WHERE id_permiso_rol = ?', [id_permiso_rol, asignado_por]
+    static async revocarPermiso(id_permiso_rol, revocado_por) {
+        const [resultado] = await pool.query('UPDATE permisos_roles SET activo = 0, fecha_revocado = NOW(), revocado_por = ? WHERE id_permiso_rol = ? AND activo = 1', [revocado_por, id_permiso_rol]
         );
+        return resultado.affectedRows > 0;
     }
-
+    
 };
 
 module.exports = PermisoRol;

@@ -73,7 +73,7 @@ function Sidebar() {
                 key={item.to}
                 to={item.to}
                 className={({isActive})=>
-                  isActive ? `${styles.navlink} ${styles.activo}`:styles.navlink
+                  isActive ? `${styles.navLink} ${styles.activo}`:styles.navLink
                 }
               >
                 <i className={`bi ${item.icono}`}/>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { registrarRol, consultarRoles, actualizarRol, eliminarRol } from '../services/roles_service';
+import { registrarRol, consultarRoles, actualizarRol, eliminarRol } from '../services/roles.service';
 import { useEstadoPeticion } from './useEstadoPeticion';
 
 export function useRoles() {
@@ -7,8 +7,13 @@ export function useRoles() {
     const { cargando, error, ejecutar } = useEstadoPeticion();
 
     const cargarRoles = useCallback(async () => {
-        const { data } = await ejecutar(() => consultarRoles());
+        try {
+            const { data } = await ejecutar(() => consultarRoles());
         setRoles(data);
+        } catch {
+            console.error('Error al cargar los roles.');
+        }
+        
     }, [ejecutar]);
 
     useEffect(() => {

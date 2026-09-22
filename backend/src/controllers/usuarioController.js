@@ -30,12 +30,30 @@ async function cambiarEstadoUsuario (req, res) {
 
 async function listarUsuarios (req, res) {
     try {
-        const {pagina,tamano} = req.query;
-        const usuarios = await UsuarioService.consultarUsuarios(req.usuario, {pagina, tamano});
+        const {pagina, tamano, busqueda} = req.query;
+        const usuarios = await UsuarioService.consultarUsuarios(req.usuario, {pagina, tamano, busqueda});
         res.json(usuarios);
     } catch (error) {
         res.status(error.estado || 400).json({ error: error.message});
     }
 }
 
-module.exports = {crearUsuario, actualizarUsuario, cambiarEstadoUsuario, listarUsuarios};
+async function asignarRol(req, res) {
+    try{
+        const idAsignacion = await UsuarioService.asignarRol(req.body.id_usuario, req.body.codigo_rol, req.usuario.id);
+        res.status(201).json({mensaje:'Rol asignado exitosamente.', id:idAsignacion})
+    } catch(error){
+        res.status(error.estado || 400).json({error: error.message});
+    }
+}
+
+async function revocarRol(req, res) {
+    try {
+        await UsuarioService.revocarRol(req.body.id_usuario, req.body.codigo_rol, req.usuario.id);
+        res.status(200).json({mensaje:'Rol revocado de manera exitosa.'})
+    } catch (error) {
+        res.status(error.estado || 400).json({error: error.message});
+    }
+}
+
+module.exports = {crearUsuario, actualizarUsuario, cambiarEstadoUsuario, listarUsuarios, asignarRol, revocarRol};

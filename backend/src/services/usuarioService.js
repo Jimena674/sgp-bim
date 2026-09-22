@@ -3,6 +3,7 @@ const EstadoUsuario = require('../models/EstadoUsuario');
 const Estado = require('../models/Estado');
 const RolUsuario = require('../models/RolUsuario');
 const PermisoRol = require('../models/PermisoRol');
+const Rol = require('../models/Rol');
 const errores = require('../utils/errores');
 const bcrypt = require('bcrypt');
 const {validarIdentificacion, validarUnicidad} = require('../utils/validadores');
@@ -130,6 +131,7 @@ class UsuarioService {
     }
 
     static async consultarUsuarios(usuarioSolicitante, filtros = {}) {
+
         const {id: idSolicitante} = usuarioSolicitante;
         const {pagina, tamano, offset} = normalizarPaginacion(filtros.pagina, filtros.tamano);
 
@@ -138,13 +140,51 @@ class UsuarioService {
 
         const puedeConsultarTodos = await PermisoRol.tienePermiso(rolActual.id_rol, PERMISO_CONSULTAR_TODOS);
         if(puedeConsultarTodos) {
-            const {filas, total} = await Usuario.obtenerTodosPaginado(tamano, offset);
+            const {filas, total} = await Usuario.obtenerTodosPaginado(tamano, offset, filtros.busqueda);
             return respuestaPaginada(filas, total, pagina, tamano);
         }
 
         const usuarioPropio = await Usuario.obtenerPorId(idSolicitante);
         const filas = usuarioPropio ? [usuarioPropio] : [];
         return respuestaPaginada(filas, filas.length, pagina, tamano);
+        
+    }
+
+    static async asignarRol(id_usuario, codigo_rol, asignado_por){
+
+        if(!id_usuario || !codigo_rol) {
+            throw new Error('El usuario y el código del rol son obligatorios.');
+        }
+
+        const usuario = await Usuario.obtenerPorId(id_usuario);
+        if(!usuario) throw new errores.ErrorConEstado('Usuario no encontrado.', 404);
+
+        const rol = await Rol.obtenerPorCodigo(codigo_rol);
+        if(!rol) throw new errores.ErrorConEstado('Rol no encontrado.', 404);
+
+        const yaAsignado = await RolUsuario.tieneRolActivo(id_usuario, rol.id_rol);
+        if(yaAsignado) throw new errores.ErrorConEstado('El usuario ya tiene este rol asignado.', 409);
+
+        return await RolUsuario.asignarRol(id_usuario, rol.id_rol, asignado_por);
+
+    }
+
+    static async revocarRol(id_usuario, codigo_rol, revocado_por){
+
+        if(!id_usuario || !codigo_rol) {
+            throw new Error('El usuario y el código del rol son obligatorios.');
+        }
+        
+        const usuario = await Usuario.obtenerPorId(id_usuario);
+        if(!usuario) throw new errores.ErrorConEstado('Usuario no encontrado.', 404);
+
+        const rol = await Rol.obtenerPorCodigo(codigo_rol);
+        if(!rol) throw new errores.ErrorConEstado('Rol no encontrado.', 404);
+
+        const rolActivo = await RolUsuario.tieneRolActivo(id_usuario, rol.id_rol);
+        if(!rolActivo) throw new errores.ErrorConEstado('El usuario ya tiene este rol revocado.', 409);
+
+        return await RolUsuario.revocarRol(id_usuario, rol.id_rol, revocado_por);
     }
 }
 

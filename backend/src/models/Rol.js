@@ -1,5 +1,4 @@
 const pool = require('../config/db');
-
 class Rol {
 
     static async obtenerTodos () {
@@ -24,7 +23,7 @@ class Rol {
 
     static async registrar (datosRol) {
         const {nombre_rol, codigo_rol, descripcion_rol, bg_color} = datosRol;
-        const [resultado] = await pool.query('INSERT INTO roles (nombre_rol, codigo_rol, descripcion_rol, bg_color) VALUES (?, ?, ?, ?)', [nombre_rol, codigo_rol, descripcion_rol, bg_color]);
+        const [resultado] = await pool.query('INSERT INTO roles (nombre_rol, codigo_rol, descripcion_rol, bg_color) VALUES (?, ?, ?, ?)', [nombre_rol, codigo_rol, descripcion_rol, bg_color ?? null]);
         return resultado.insertId;
     }
 

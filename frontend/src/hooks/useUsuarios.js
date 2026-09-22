@@ -4,7 +4,7 @@ import {
     actualizarUsuario,
     listarUsuarios,
     cambiarEstadoUsuario,
-} from '../services/usuarios_service';
+} from '../services/usuarios.service.js';
 import { useEstadoPeticion } from './useEstadoPeticion';
 
 const TAMANO_DEFECTO = 10;
@@ -17,10 +17,15 @@ export function useUsuarios(filtrosIniciales = {}) {
     const { cargando, error, ejecutar } = useEstadoPeticion();
 
     const cargarUsuarios = useCallback(async () => {
-        const { data } = await ejecutar(() => 
+        try {
+            const { data } = await ejecutar(() => 
             listarUsuarios({...filtros, pagina, tamano: TAMANO_DEFECTO}));
         setUsuarios(data.datos);
         setPaginacion(data.paginacion);
+        } catch {
+            console.error('Error al cargar los usuarios.');
+        }
+        
     }, [ejecutar, filtros, pagina]);
 
     useEffect(() => {

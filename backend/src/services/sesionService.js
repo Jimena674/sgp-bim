@@ -60,7 +60,7 @@ class SesionService {
          const jti = crypto.randomUUID();
 
          const token = jwt.sign(
-            {id: usuario.id_usuario, id_rol: roles[0].id_rol}, process.env.JWT_SECRET, {expiresIn: '8h', jwtid: jti}
+            {id: usuario.id_usuario, id_rol: rol.id_rol}, process.env.JWT_SECRET, {expiresIn: '8h', jwtid: jti}
          );
 
          const id_sesion = await Sesion.crearSesion({

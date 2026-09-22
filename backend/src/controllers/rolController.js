@@ -36,4 +36,31 @@ async function consultarRoles(req, res) {
     }
 }
 
-module.exports = {registrarRol, actualizarRol, eliminarRol, consultarRoles};
+async function asignarPermiso(req, res) {
+    try {
+        const idAsignacion = await RolService.asignarPermiso(req.body.codigo_rol, req.body.codigo_permiso, req.usuario.id);
+        res.status(201).json({mensaje: 'Permiso asignado exitosamente.', id:idAsignacion})
+    } catch (error) {
+        res.status(error.estado || 400).json({error:error.message});
+    }
+}
+
+async function revocarPermiso(req, res) {
+    try {
+        await RolService.revocarPermiso(req.body.codigo_rol, req.body.codigo_permiso, req.usuario.id);
+        res.status(200).json({mensaje:'Permiso revocado de manera exitosa.'})
+    } catch (error) {
+        res.status(error.estado || 400).json({error:error.message});
+    }
+}
+
+async function consultarPermisosDeRol(req, res) {
+    try {
+        const permisos = await RolService.obtenerPermisosDeRol(req.params.id);
+        res.json(permisos);
+    } catch (error) {
+        res.status(error.estado || 400).json({error: error.message});
+    }
+}
+
+module.exports = {registrarRol, actualizarRol, eliminarRol, consultarRoles, asignarPermiso, revocarPermiso, consultarPermisosDeRol};

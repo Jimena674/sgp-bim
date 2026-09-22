@@ -9,10 +9,49 @@ class Usuario {
         return filas;
     }
 
-    static async obtenerTodosPaginado(tamano, offset) {
-        const queryDatos = 'SELECT * FROM usuarios LIMIT ? OFFSET ?';
-        const queryConteo = 'SELECT COUNT(*) AS total FROM usuarios';
-        return ejecutarConsultaPaginada(pool, queryDatos, queryConteo, [], tamano, offset);
+    static async obtenerTodosPaginado(tamano, offset, busqueda) {
+
+        const condiciones = busqueda
+            ? 'WHERE u.nombre_usuario LIKE ? OR u.correo LIKE ?'
+            : '';
+        const params = busqueda ? [`%${busqueda}%`, `%${busqueda}%`] : [];
+
+        const queryDatos = `
+            SELECT 
+                u.*,
+                e.codigo_estado, e.nombre_estado,
+                r.codigo_rol, r.nombre_rol, r.bg_color
+            FROM usuarios u
+            LEFT JOIN (
+                SELECT eu1.id_usuario, eu1.id_estado
+                FROM estados_usuarios eu1
+                INNER JOIN (
+                    SELECT id_usuario, MAX(fecha_asignacion) AS ultima_fecha
+                    FROM estados_usuarios
+                    GROUP BY id_usuario
+                ) eu2 ON eu1.id_usuario = eu2.id_usuario AND eu1.fecha_asignacion = eu2.ultima_fecha
+            ) estado_actual ON estado_actual.id_usuario = u.id_usuario
+            LEFT JOIN estados e ON e.id_estado = estado_actual.id_estado
+            LEFT JOIN (
+                SELECT ru1.id_usuario, ru1.id_rol
+                FROM roles_usuarios ru1
+                INNER JOIN (
+                    SELECT id_usuario, MAX(fecha_asignacion) AS ultima_fecha
+                    FROM roles_usuarios
+                    WHERE activo = TRUE
+                    GROUP BY id_usuario
+                ) ru2 ON ru1.id_usuario = ru2.id_usuario AND ru1.fecha_asignacion = ru2.ultima_fecha
+                WHERE ru1.activo = TRUE
+            ) rol_actual ON rol_actual.id_usuario = u.id_usuario
+            LEFT JOIN roles r ON r.id_rol = rol_actual.id_rol
+            ${condiciones}
+            ORDER BY u.id_usuario
+            LIMIT ? OFFSET ?
+        `;
+
+        const queryConteo = `SELECT COUNT(*) AS total FROM usuarios u ${condiciones}`;
+
+        return ejecutarConsultaPaginada(pool, queryDatos, queryConteo, params, tamano, offset); 
     }
 
     //Obtener por id

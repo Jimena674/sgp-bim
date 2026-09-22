@@ -1,0 +1,10 @@
+@import '../../assets/styles/variables';
+
+.pagina { min-height: 100vh; background-color: $body-bg; display: flex; align-items: center; justify-content: center; }
+.tarjeta { background-color: $card-bg; border: 1px solid $border-color; border-radius: 12px; padding: 40px 36px; width: 360px; }
+.encabezado { text-align: center; margin-bottom: 24px; }
+.icono { width: 44px; height: 44px; margin: 0 auto 12px; background-color: $primary; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: #fff; }
+.titulo { font-size: 1.1rem; font-weight: 700; color: #fff; }
+.subtitulo { font-size: 0.78rem; color: $text-muted; margin-top: 2px; }
+.error { font-size: 0.78rem; color: #E05C5C; margin-bottom: 12px; }
+.nota { margin-top: 24px; padding: 12px; background-color: #0D1117; border: 1px solid $border-color; border-radius: 6px; font-size: 0.7rem; color: $text-muted; text-align: center; }

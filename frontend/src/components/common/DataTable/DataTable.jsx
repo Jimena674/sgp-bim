@@ -1,7 +1,8 @@
+import { Fragment } from 'react';
 import { Table } from 'react-bootstrap';
 import styles from './DataTable.module.scss';
 
-export function DataTable({ columnas, filas, claveFila = 'id' }) {
+export function DataTable({ columnas, filas, claveFila = 'id', filaExpandida, renderExpandido }) {
   return (
     <div className={styles.contenedor}>
       <Table borderless className={styles.tabla}>
@@ -13,11 +14,20 @@ export function DataTable({ columnas, filas, claveFila = 'id' }) {
             <tr><td colSpan={columnas.length} className={styles.vacio}>Sin registros para mostrar.</td></tr>
           ) : (
             filas.map((fila) => (
-              <tr key={fila[claveFila]}>
-                {columnas.map((c) => (
-                  <td key={c.clave}>{c.render ? c.render(fila) : fila[c.clave]}</td>
-                ))}
-              </tr>
+              <Fragment key={fila[claveFila]}>
+                <tr>
+                  {columnas.map((c) => (
+                    <td key={c.clave}>{c.render ? c.render(fila) : fila[c.clave]}</td>
+                  ))}
+                </tr>
+                {filaExpandida?.(fila) && (
+                  <tr>
+                    <td colSpan={columnas.length} className={styles.filaExpandida}>
+                      {renderExpandido(fila)}
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
             ))
           )}
         </tbody>

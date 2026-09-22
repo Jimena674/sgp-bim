@@ -29,17 +29,25 @@ class Sesion {
     }
 
     static async consultarHistorialSesiones({id_usuario, desde, hasta, tamano, offset}){
-        
+
         let condiciones = 'WHERE 1=1';
         const params = [];
-        
-        if (id_usuario) {condiciones += ' AND id_usuario = ?'; params.push(id_usuario);}
-        if (desde) {condiciones += ' AND log_in >= ?'; params.push(desde);}
-        if (hasta) {condiciones += ' AND log_in <= ?'; params.push(hasta);}
 
-        const queryDatos = `SELECT * FROM sesiones ${condiciones} ORDER BY log_in DESC LIMIT ? OFFSET ?`;
+        if (id_usuario) {condiciones += ' AND s.id_usuario = ?'; params.push(id_usuario);}
+        if (desde) {condiciones += ' AND s.log_in >= ?'; params.push(desde);}
+        if (hasta) {condiciones += ' AND s.log_in <= ?'; params.push(hasta);}
 
-        const queryConteo = `SELECT COUNT(*) AS total FROM sesiones ${condiciones}`;
+        const queryDatos = `
+            SELECT s.*, e.codigo_estado, e.nombre_estado, u.nombre_usuario
+            FROM sesiones s
+            LEFT JOIN estados e ON e.id_estado = s.id_estado
+            LEFT JOIN usuarios u ON u.id_usuario = s.id_usuario
+            ${condiciones}
+            ORDER BY s.log_in DESC
+            LIMIT ? OFFSET ?
+        `;
+
+        const queryConteo = `SELECT COUNT(*) AS total FROM sesiones s ${condiciones}`;
 
         return ejecutarConsultaPaginada(pool, queryDatos, queryConteo, params, tamano, offset);
     }

@@ -3,6 +3,7 @@ const PermisoRol = require('../models/PermisoRol');
 const RolUsuario = require('../models/RolUsuario');
 const {validarUnicidad} = require('../utils/validadores');
 const {ErrorConEstado} = require('../utils/errores');
+const Permiso = require('../models/Permiso');
 
 const REGEX_NOMBRE = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{1,40}$/;
 const REGEX_CODIGO = /^[a-z]{1,40}$/;
@@ -47,7 +48,7 @@ class RolService {
         if (!rol) throw new ErrorConEstado('Rol no encontrado.', 404);
         
         //Limpiar los campos que se pueden actualizar
-        const camposPermitidos = ['nombre_rol', 'codigo_rol', 'descripcion_rol'];
+        const camposPermitidos = ['nombre_rol', 'codigo_rol', 'descripcion_rol', 'bg_color'];
         const datosLimpios = {};
         for (const campo of camposPermitidos) {
             if (datosRol[campo] !== undefined) {
@@ -113,6 +114,55 @@ class RolService {
             descripcion_rol: rolPropio.descripcion_rol
         }];
     }
+
+    static async asignarPermiso (codigo_rol, codigo_permiso, asignado_por) {
+
+        if(!codigo_rol || !codigo_permiso) {
+            throw new Error('El código del permiso y el código del rol son obligatorios.');
+        }
+
+        const rol = await Rol.obtenerPorCodigo(codigo_rol);
+        if(!rol) throw new ErrorConEstado('Rol no encontrado.', 404);
+
+        const permiso = await Permiso.obtenerPorCodigo(codigo_permiso);
+        if(!permiso) throw new ErrorConEstado('Permiso no encontrado.', 404);
+
+        const yaAsignado = await PermisoRol.tienePermiso(rol.id_rol, codigo_permiso);
+        if(yaAsignado) {
+            throw new ErrorConEstado('El rol ya tiene ese permiso asignado.', 409);
+        }
+
+        return await PermisoRol.asignarPermiso(rol.id_rol, permiso.id_permiso, asignado_por);
+    }
+
+    static async revocarPermiso (codigo_rol, codigo_permiso, revocado_por) {
+
+        if(!codigo_rol || !codigo_permiso) {
+            throw new Error('El código del permiso y el código del rol son obligatorios.');
+        }
+
+        const rol = await Rol.obtenerPorCodigo(codigo_rol);
+        if(!rol) throw new ErrorConEstado('Rol no encontrado.', 404);
+
+        const permiso = await Permiso.obtenerPorCodigo(codigo_permiso);
+        if(!permiso) throw new ErrorConEstado('Permiso no encontrado.', 404);
+
+        const asignacionActiva = await PermisoRol.obtenerAsignacionActiva(rol.id_rol, permiso.id_permiso);
+        if(!asignacionActiva) {
+            throw new ErrorConEstado('El rol ya tiene el permiso revocado.', 409);
+        }
+
+        return await PermisoRol.revocarPermiso(asignacionActiva.id_permiso_rol, revocado_por);
+
+    }
+
+    static async obtenerPermisosDeRol(id_rol) {
+        const rol = await Rol.obtenerPorId(id_rol);
+        if (!rol) throw new ErrorConEstado('Rol no encontrado.', 404);
+
+        return await PermisoRol.obtenerPermisosPorRol(id_rol);
+    }
+
 }
 
 module.exports = RolService;

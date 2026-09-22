@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { consultarHistorial } from '../services/sesiones_service';
+import { consultarHistorial } from '../services/sesiones.service';
 import { useEstadoPeticion } from './useEstadoPeticion';
 
 const TAMANO_DEFECTO = 10;
@@ -12,11 +12,16 @@ export function useHistorialSesiones(filtrosIniciales = {}) {
     const { cargando, error, ejecutar } = useEstadoPeticion();
 
     const cargarHistorial = useCallback(async () => {
-        const { data } = await ejecutar(() =>
+        try {
+            const { data } = await ejecutar(() =>
             consultarHistorial({ ...filtros, pagina, tamano: TAMANO_DEFECTO })
         );
         setSesiones(data.datos);
         setPaginacion(data.paginacion);
+        } catch {
+            console.error('Error al cargar el historial.');
+        }
+        
     }, [ejecutar, filtros, pagina]);
 
     useEffect(() => {
