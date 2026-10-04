@@ -16,12 +16,15 @@ api.interceptors.request.use((config) => {
 
 //Interceptor de response
 api.interceptors.response.use(
-    (response) => response, 
+    (response) => response,
     (error) => {
         const status = error.response?.status;
         const esRutaLogin = error.config?.url?.includes('/login');
-        if(status === 401 && !esRutaLogin) {
-            localStorage.removeItem('token'),
+        if (status === 401 && !esRutaLogin) {
+            const mensaje = error.response?.data?.error;
+            if (mensaje) sessionStorage.setItem('mensaje_sesion', mensaje);
+            localStorage.removeItem('token');
+            localStorage.removeItem('nombre_usuario');
             window.location.href = '/login';
         }
         return Promise.reject(error);

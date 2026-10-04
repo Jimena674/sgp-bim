@@ -38,6 +38,11 @@ class PermisoRol {
         );
         return resultado.affectedRows > 0;
     }
+
+    static async obtenerAsignacionesActivas () {
+        const [filas] = await pool.query('SELECT id_rol, id_permiso FROM permisos_roles WHERE activo = 1');
+        return filas;
+    }
     
 };
 

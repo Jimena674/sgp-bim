@@ -10,7 +10,7 @@ function Topbar({ titulo, breadcrumb }) {
     try {
       await logout();
     } finally {
-      navigate('/login', { replace: true });
+      navigate('/login', { replace: true, state: { mensaje: null } });
     }
   };
 

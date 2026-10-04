@@ -8,11 +8,15 @@ import { Toast } from '../../components/common/Toast/Toast';
 import { EstadoBadge } from '../../components/common/EstadoBadge/EstadoBadge';
 import { RolBadge } from '../../components/common/RolBadge';
 import { useUsuarios } from '../../hooks/useUsuarios';
+import { useTiposPorModulo } from '../../hooks/useTiposPorModulos';
+import { useRoles } from '../../hooks/useRoles';
 
 const FORM_VACIO = { nombre_usuario: '', id_tipo: '', numero_id: '', correo: '', telefono: '', password: '' };
 
 function UsuariosPage() {
-  const { usuarios, paginacion, pagina, cargando, error, aplicarFiltros, irAPagina, crear, actualizar, cambiarEstado } = useUsuarios();
+  const { usuarios, paginacion, pagina, cargando, error, aplicarFiltros, irAPagina, crear, actualizar, cambiarEstado, asignarRolUsuario, revocarRolUsuario } = useUsuarios();
+  const { tipos: tiposIdentificacion } = useTiposPorModulo('usuarios');
+  const { roles } = useRoles();
 
   const [busqueda, setBusqueda] = useState('');
   const [modalAbierto, setModalAbierto] = useState(false);
@@ -20,6 +24,8 @@ function UsuariosPage() {
   const [form, setForm] = useState(FORM_VACIO);
   const [errorForm, setErrorForm] = useState(null);
   const [toast, setToast] = useState({ visible: false, mensaje: '', tipo: 'ok' });
+  const [codigoRol, setCodigoRol] = useState('');
+  const [codigoRolInicial, setCodigoRolInicial] = useState('');
 
   // Debounce: evita una petición por cada tecla presionada en el buscador.
   useEffect(() => {
@@ -43,19 +49,52 @@ function UsuariosPage() {
     setModalAbierto(true);
   }
 
+  function abrirCreacion() {
+    setUsuarioEditando(null);
+    setForm(FORM_VACIO);
+    setCodigoRol('');
+    setCodigoRolInicial('');
+    setErrorForm(null);
+    setModalAbierto(true);
+  }
+
+  function abrirEdicion(usuario) {
+    setUsuarioEditando(usuario);
+    setForm({ ...FORM_VACIO, ...usuario, password: '' });
+    setCodigoRol(usuario.codigo_rol || '');
+    setCodigoRolInicial(usuario.codigo_rol || '');
+    setErrorForm(null);
+    setModalAbierto(true);
+  }
+
   async function manejarGuardar(e) {
     e.preventDefault();
     setErrorForm(null);
     try {
+      let idUsuario;
       if (usuarioEditando) {
         const datos = { ...form };
         if (!datos.password) delete datos.password;
         await actualizar(usuarioEditando.id_usuario, datos);
-        setToast({ visible: true, mensaje: 'Usuario actualizado exitosamente.', tipo: 'ok' });
+        idUsuario = usuarioEditando.id_usuario;
       } else {
-        await crear(form);
-        setToast({ visible: true, mensaje: 'Usuario creado exitosamente.', tipo: 'ok' });
+        const creado = await crear(form);
+        idUsuario = creado.id;
       }
+
+      if (codigoRol !== codigoRolInicial) {
+        if (codigoRol) {
+          await asignarRolUsuario(idUsuario, codigoRol);
+        } else {
+          await revocarRolUsuario(idUsuario, codigoRolInicial);
+        }
+      }
+
+      setToast({
+        visible: true,
+        mensaje: usuarioEditando ? 'Usuario actualizado exitosamente.' : 'Usuario creado exitosamente.',
+        tipo: 'ok',
+      });
       setModalAbierto(false);
     } catch (err) {
       setErrorForm(err.response?.data?.error || 'No fue posible guardar el usuario.');
@@ -132,8 +171,13 @@ function UsuariosPage() {
             <div className="row g-2">
               <div className="col-6">
                 <label className="form-label">Tipo de identificación *</label>
-                <input className="form-control" required value={form.id_tipo}
-                  onChange={(e) => setForm({ ...form, id_tipo: e.target.value })} />
+                <select className="form-select" required value={form.id_tipo}
+                  onChange={(e) => setForm({ ...form, id_tipo: e.target.value })}>
+                  <option value="">Seleccionar…</option>
+                  {tiposIdentificacion.map((t) => (
+                    <option key={t.id_tipo} value={t.id_tipo}>{t.nombre_tipo}</option>
+                  ))}
+                </select>
               </div>
               <div className="col-6">
                 <label className="form-label">Número de identificación *</label>
@@ -151,6 +195,7 @@ function UsuariosPage() {
               <input className="form-control" value={form.telefono || ''}
                 onChange={(e) => setForm({ ...form, telefono: e.target.value })} />
             </div>
+
             <div className="mb-2">
               <label className="form-label">
                 {usuarioEditando ? 'Nueva contraseña (opcional)' : 'Contraseña *'}
@@ -159,6 +204,19 @@ function UsuariosPage() {
                 onChange={(e) => setForm({ ...form, password: e.target.value })} />
               <div className="form-text">Mínimo 8 caracteres, mayúscula, minúscula, número y carácter especial.</div>
             </div>
+            
+            <div className="mb-2">
+              <label className="form-label">Rol</label>
+              <select className="form-select" value={codigoRol}
+                onChange={(e) => setCodigoRol(e.target.value)}>
+                <option value="">Sin rol</option>
+                {roles.filter((r) => r.codigo_rol).map((r) => (
+                  <option key={r.id_rol} value={r.codigo_rol}>{r.nombre_rol}</option>
+                ))}
+              </select>
+              <div className="form-text">Un usuario sin rol no puede iniciar sesión.</div>
+            </div>
+
           </Modal.Body>
           <Modal.Footer>
             <Button variant="outline-secondary" onClick={() => setModalAbierto(false)}>Cancelar</Button>

@@ -68,14 +68,14 @@ class RolService {
 
         if(nombre_rol) {
             const existe = await Rol.obtenerPorNombre(nombre_rol);
-            if (existe && existe.id_rol !== id) {
+            if (existe && existe.id_rol !== Number(id)) {
                 throw new Error('Ya existe un rol con ese nombre.');
             }
         }
         
         if(codigo_rol) {
             const existe = await Rol.obtenerPorCodigo(codigo_rol);
-            if(existe && existe.id_rol !== id) {
+            if(existe && existe.id_rol !== Number(id)) {
                 throw new Error('Ya existe un rol con ese código.');
             }
         }
@@ -86,7 +86,7 @@ class RolService {
 
     static async eliminarRol (id) {
         const rol = await Rol.obtenerPorId(id);
-        if (!rol) throw new Error('Rol no encontrado.', 404);
+        if (!rol) throw new ErrorConEstado('Rol no encontrado.', 404);
 
         const totalUsuarios = await Rol.contarUsuariosAsociados(id);
         if (totalUsuarios > 0) {
@@ -161,6 +161,10 @@ class RolService {
         if (!rol) throw new ErrorConEstado('Rol no encontrado.', 404);
 
         return await PermisoRol.obtenerPermisosPorRol(id_rol);
+    }
+
+    static async obtenerAsignacionesPermisos() {
+        return await PermisoRol.obtenerAsignacionesActivas();
     }
 
 }

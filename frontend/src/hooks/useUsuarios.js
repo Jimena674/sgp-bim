@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useEstadoPeticion } from './useEstadoPeticion';
 import {
     crearUsuario,
     actualizarUsuario,
     listarUsuarios,
     cambiarEstadoUsuario,
+    asignarRol,
+    revocarRol,
 } from '../services/usuarios.service.js';
-import { useEstadoPeticion } from './useEstadoPeticion';
 
 const TAMANO_DEFECTO = 10;
 
@@ -59,6 +61,18 @@ export function useUsuarios(filtrosIniciales = {}) {
         return resultado.data;
     }, [ejecutar, cargarUsuarios]);
 
-    return { usuarios, paginacion, pagina, cargando, error, aplicarFiltros, irAPagina, crear, actualizar, cambiarEstado, recargar: cargarUsuarios };
+    const asignarRolUsuario = useCallback(async (id_usuario, codigo_rol) => {
+        const resultado = await ejecutar(() => asignarRol(id_usuario, codigo_rol));
+        await cargarUsuarios();
+        return resultado.data;
+    }, [ejecutar, cargarUsuarios]);
+
+    const revocarRolUsuario = useCallback(async (id_usuario, codigo_rol) => {
+        const resultado = await ejecutar(() => revocarRol(id_usuario, codigo_rol));
+        await cargarUsuarios();
+        return resultado.data;
+    }, [ejecutar, cargarUsuarios]);
+
+    return { usuarios, paginacion, pagina, cargando, error, aplicarFiltros, irAPagina, crear, actualizar, cambiarEstado, asignarRolUsuario, revocarRolUsuario, recargar: cargarUsuarios };
 }
 

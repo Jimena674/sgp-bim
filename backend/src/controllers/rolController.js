@@ -63,4 +63,12 @@ async function consultarPermisosDeRol(req, res) {
     }
 }
 
-module.exports = {registrarRol, actualizarRol, eliminarRol, consultarRoles, asignarPermiso, revocarPermiso, consultarPermisosDeRol};
+async function consultarAsignacionesPermisos(req, res) {
+    try {
+        res.json(await RolService.obtenerAsignacionesPermisos());
+    } catch (error) {
+        res.status(error.estado || 400).json({error: error.message});
+    }
+}
+
+module.exports = {registrarRol, actualizarRol, eliminarRol, consultarRoles, asignarPermiso, revocarPermiso, consultarPermisosDeRol, consultarAsignacionesPermisos};

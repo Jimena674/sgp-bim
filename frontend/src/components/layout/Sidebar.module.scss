@@ -111,3 +111,31 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.grupoBoton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  padding: 14px 18px 4px;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8b93a1;
+  cursor: pointer;
+
+  &:hover {
+    color: $body-color;
+  }
+
+  i {
+    font-size: 0.75rem;
+  }
+}
+
+.grupoItems {
+  display: flex;
+  flex-direction: column;
+}

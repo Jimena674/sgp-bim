@@ -5,3 +5,4 @@ export const consultarRoles = () => api.get('/roles');
 export const actualizarRol = (id, datos) => api.put(`/roles/${id}`, datos);
 export const eliminarRol = (id) => api.delete(`/roles/${id}`);
 export const consultarPermisosDeRol = (id) => api.get(`/roles/${id}/permisos`);
+export const consultarAsignacionesPermisos = () => api.get('/roles/permisos-asignados');

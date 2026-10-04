@@ -8,10 +8,28 @@ class RolUsuario {
     }
 
     static async asignarRol(id_usuario, id_rol, asignado_por) {
-        const [resultado] = await pool.query(
-            'INSERT INTO roles_usuarios (id_rol, id_usuario, fecha_asignacion, asignado_por, activo) VALUES (?, ?, NOW(), ?, TRUE)', [id_rol, id_usuario, asignado_por]
-        );
-        return resultado.insertId;
+        const conexion = await pool.getConnection();
+        try {
+            await conexion.beginTransaction();
+
+            await conexion.query(
+                'UPDATE roles_usuarios SET activo = FALSE, fecha_revocado = NOW(), revocado_por = ? WHERE id_usuario = ? AND activo = TRUE',
+                [asignado_por, id_usuario]
+            );
+
+            const [resultado] = await conexion.query(
+                'INSERT INTO roles_usuarios (id_rol, id_usuario, fecha_asignacion, asignado_por, activo) VALUES (?, ?, NOW(), ?, TRUE)',
+                [id_rol, id_usuario, asignado_por]
+            );
+
+            await conexion.commit();
+            return resultado.insertId;
+        } catch (error) {
+            await conexion.rollback();
+            throw error;
+        } finally {
+            conexion.release();
+        }
     }
 
     static async revocarRol(id_usuario, id_rol, revocado_por){

@@ -7,5 +7,6 @@ const verificarSesion = require('../middlewares/verificarSesion');
 router.post('/login', sesionController.login);
 router.patch('/logout', verificarSesion, sesionController.logout);
 router.get('/', verificarSesion, verificarPermiso('consultar_historial_acceso'), sesionController.consultarHistorial);
+router.get('/sesion', verificarSesion.pasiva, (req, res) => res.json({activa: true}));
 
 module.exports = router;

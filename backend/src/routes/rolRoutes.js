@@ -11,6 +11,6 @@ router.put('/revocar-permiso', verificarSesion, verificarPermiso('gestionar_role
 router.put('/:id', verificarSesion, verificarPermiso('gestionar_roles'), rolController.actualizarRol);
 router.delete('/:id', verificarSesion, verificarPermiso('gestionar_roles'), rolController.eliminarRol);
 router.get('/:id/permisos', verificarSesion, rolController.consultarPermisosDeRol);
-
+router.get('/permisos-asignados', verificarSesion, verificarPermiso('gestionar_roles'), rolController.consultarAsignacionesPermisos);
 
 module.exports = router;

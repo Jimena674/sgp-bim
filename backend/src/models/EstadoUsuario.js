@@ -9,8 +9,11 @@ class EstadoUsuario {
 
     //Obtener el último estado de un usuario
     static async estadoActual(id_usuario) {
-    const [filas] = await pool.query('SELECT eu.*, e.nombre_estado FROM estados_usuarios eu JOIN estados e ON eu.id_estado = e.id_estado WHERE eu.id_usuario = ? ORDER BY eu.fecha_asignacion DESC LIMIT 1', [id_usuario]);
-    return filas[0];
+        const [filas] = await pool.query(
+            'SELECT eu.*, e.codigo_estado, e.nombre_estado FROM estados_usuarios eu JOIN estados e ON eu.id_estado = e.id_estado WHERE eu.id_usuario = ? ORDER BY eu.fecha_asignacion DESC LIMIT 1', 
+            [id_usuario]
+        );
+        return filas[0];
     }
 
     //Registrar el cambio de estado

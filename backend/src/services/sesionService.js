@@ -36,6 +36,7 @@ class SesionService {
             if(intentos >= MAX_INT_FALLIDOS) {
                 const usuarioInactivo = await Estado.obtenerPorCodigo(EST_USUARIO_INACTIVO, COD_MOD_USUARIOS);
                 await EstadoUsuario.asignarEstado(usuario.id_usuario, usuarioInactivo.id_estado, null);
+                await Usuario.reiniciarIntentosFallidos(usuario.id_usuario);
                 throw new errores.ErrorConEstado('Usuario bloqueado por múltiples intentos fallidos.', 403);
             }
 

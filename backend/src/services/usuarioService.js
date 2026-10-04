@@ -4,6 +4,8 @@ const Estado = require('../models/Estado');
 const RolUsuario = require('../models/RolUsuario');
 const PermisoRol = require('../models/PermisoRol');
 const Rol = require('../models/Rol');
+const Modulo = require('../models/Modulo');
+const Tipo = require('../models/Tipo');
 const errores = require('../utils/errores');
 const bcrypt = require('bcrypt');
 const {validarIdentificacion, validarUnicidad} = require('../utils/validadores');
@@ -41,6 +43,11 @@ class UsuarioService {
         //Regla: # identificación solo números y letras, y máximo 20 caracteres
         if(!validarIdentificacion(numero_id)) {
             throw new Error('El número de identificación solo puede contener letras y números, y máximo 20 caracteres.');
+        }
+
+        if (id_tipo) {
+            const tipoValido = await Tipo.obtenerPorId(id_tipo, COD_MOD_USUARIOS);
+            if (!tipoValido) throw new Error('Tipo de identificación inválido.');
         }
 
         //Regla: contraseña(mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial)
@@ -89,6 +96,20 @@ class UsuarioService {
 
         //validaciones
 
+        if (datosUsuario.id_tipo !== undefined && !id_tipo) {
+            throw new Error('El tipo de identificación no puede quedar vacío.');
+        }
+
+        if (id_tipo) {
+            const tipo = await Tipo.obtenerPorId(id_tipo);
+            if (!tipo) throw new Error('Tipo de identificación inválido.');
+
+            const moduloUsuarios = await Modulo.obtenerPorCodigo(COD_MOD_USUARIOS);
+            if (tipo.id_modulo !== moduloUsuarios.id_modulo) {
+                throw new Error('Tipo de identificación inválido.');
+            }
+        }
+
         if(nombre_usuario && !REGEX_NOMBRE.test(nombre_usuario)) {
             throw new Error('El nombre solo puede contener letras y máximo 40 caracteres.');
         }
@@ -98,7 +119,7 @@ class UsuarioService {
                 throw new Error('El número de identificación solo puede contener letras y números, y máximo 20 caracteres.');
             }
             if (numero_id !== usuario.numero_id) {
-                validarUnicidad(await Usuario.obtenerPorNumeroId(id), 'numero_id');
+                validarUnicidad(await Usuario.obtenerPorNumeroId(numero_id), 'numero_id');
             }
         }
 

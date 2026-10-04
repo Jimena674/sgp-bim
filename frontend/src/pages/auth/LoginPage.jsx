@@ -1,13 +1,20 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import styles from './LoginPage.module.scss';
+import { useNavigate } from 'react-router-dom';
 
 function LoginPage() {
+  const location = useLocation();
   const [numero_id, setNumeroId] = useState('');
   const [password, setPassword] = useState('');
   const [verPassword, setVerPassword] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState(
+    sessionStorage.getItem('mensaje_sesion') ?? location.state?.mensaje ?? null
+  );
+  useEffect(() => {
+    sessionStorage.removeItem('mensaje_sesion');
+  }, []);
   const [cargando, setCargando] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();

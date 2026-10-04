@@ -1,11 +1,12 @@
-import {NavLink} from 'react-router-dom';
-import {useAuth} from '../../context/AuthContext';
+import { useState } from 'react';
+import { NavLink } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import styles from './Sidebar.module.scss';
 
 const GRUPOS_NAV = [
   {
-    etiqueta:'General',
-    items: [{to: '/dashboard', icono:'bi-speedometer2', texto:'Panel Principal'}],
+    etiqueta: 'General',
+    items: [{ to: '/dashboard', icono: 'bi-speedometer2', texto: 'Panel Principal' }],
   },
   {
     etiqueta: 'Administración',
@@ -43,45 +44,71 @@ const GRUPOS_NAV = [
   },
   {
     etiqueta: 'Sistema',
-    items: [{ to: '/configuracion', icono: 'bi-sliders', texto: 'Configuración' }],
+    items: [
+      { to: '/configuracion', icono: 'bi-sliders', texto: 'Configuración' },
+      { to: '/configuracion/tipos', icono: 'bi-tags', texto: 'Tipos' },
+    ],
   },
-]
+];
+
+// Estado inicial: todos los grupos abiertos
+const ESTADO_INICIAL = GRUPOS_NAV.reduce((acc, grupo) => {
+  acc[grupo.etiqueta] = true;
+  return acc;
+}, {});
 
 function Sidebar() {
-  
-  const {usuario} = useAuth();
-  const iniciales = (usuario?.nombre_usuario || '?').trim().slice(0,2).toUpperCase();
+  const { usuario } = useAuth();
+  const iniciales = (usuario?.nombre_usuario || '?').trim().slice(0, 2).toUpperCase();
+  const [gruposAbiertos, setGruposAbiertos] = useState(ESTADO_INICIAL);
+
+  function alternarGrupo(etiqueta) {
+    setGruposAbiertos((prev) => ({ ...prev, [etiqueta]: !prev[etiqueta] }));
+  }
 
   return (
     <nav className={styles.sidebar}>
-
-      <div className={styles.marca}> 
+      <div className={styles.marca}>
         <div className={styles.iconoMarca}>
-          <i className='bi bi-layers'/>
+          <i className="bi bi-layers" />
         </div>
         Gest
       </div>
 
       <div className={styles.navScroll}>
-        {GRUPOS_NAV.map((grupo) => (
-          <div key={grupo.etiqueta}>
-            <div className={styles.etiquetaSeccion}>
-              {grupo.etiqueta}
-            </div>
-            {grupo.items.map((item)=>(
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({isActive})=>
-                  isActive ? `${styles.navLink} ${styles.activo}`:styles.navLink
-                }
+        {GRUPOS_NAV.map((grupo) => {
+          const abierto = gruposAbiertos[grupo.etiqueta];
+          return (
+            <div key={grupo.etiqueta}>
+              <button
+                type="button"
+                className={styles.grupoBoton}
+                onClick={() => alternarGrupo(grupo.etiqueta)}
+                aria-expanded={abierto}
               >
-                <i className={`bi ${item.icono}`}/>
-                <span>{item.texto}</span>
-              </NavLink>
-            ))}      
-          </div>
-        ))}
+                <span>{grupo.etiqueta}</span>
+                <i className={`bi ${abierto ? 'bi-chevron-up' : 'bi-chevron-down'}`} />
+              </button>
+
+              {abierto && (
+                <div className={styles.grupoItems}>
+                  {grupo.items.map((item) => (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      className={({ isActive }) =>
+                        isActive ? `${styles.navLink} ${styles.activo}` : styles.navLink
+                      }
+                    >
+                      <i className={`bi ${item.icono}`} />
+                      <span>{item.texto}</span>
+                    </NavLink>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       <div className={styles.footer}>
@@ -92,7 +119,6 @@ function Sidebar() {
           </div>
         </div>
       </div>
-      
     </nav>
   );
 }

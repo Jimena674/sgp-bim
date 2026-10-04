@@ -1,32 +1,33 @@
-import { useState } from 'react';
-import { Modal, Button, Spinner } from 'react-bootstrap';
+import { useState, useMemo } from 'react';
+import { Modal, Button } from 'react-bootstrap';
 import { DataTable } from '../../components/common/DataTable/DataTable';
 import { RolBadge } from '../../components/common/RolBadge';
 import { IconButton } from '../../components/common/IconButton/IconButton';
 import { Toast } from '../../components/common/Toast/Toast';
 import { useRoles } from '../../hooks/useRoles';
 import { usePermisos } from '../../hooks/usePermisos';
+import { useAsignacionesPermisos } from '../../hooks/useAsignacionesPermisos';
 import api from '../../services/api';
-import { consultarPermisosDeRol } from '../../services/roles.service';
 
 const FORM_VACIO = { nombre_rol: '', codigo_rol: '', descripcion_rol: '', bg_color: '' };
 
 function RolesPage() {
   const { roles, cargando, error, crear, actualizar, eliminar } = useRoles();
   const { permisos } = usePermisos();
+  const { asignaciones, recargar: recargarAsignaciones } = useAsignacionesPermisos();
 
   const [modalAbierto, setModalAbierto] = useState(false);
   const [rolEditando, setRolEditando] = useState(null);
   const [form, setForm] = useState(FORM_VACIO);
   const [errorForm, setErrorForm] = useState(null);
   const [toast, setToast] = useState({ visible: false, mensaje: '', tipo: 'ok' });
-
   const [permisoForm, setPermisoForm] = useState({ codigo_rol: '', codigo_permiso: '' });
 
-  const [rolExpandidoId, setRolExpandidoId] = useState(null);
-  const [permisosPorRol, setPermisosPorRol] = useState({});
-  const [cargandoPermisos, setCargandoPermisos] = useState(false);
-  const [errorPermisos, setErrorPermisos] = useState(null);
+  // Conjunto "idRol-idPermiso" para consultar en O(1) si un rol tiene un permiso.
+  const asignado = useMemo(
+    () => new Set(asignaciones.map((a) => `${a.id_rol}-${a.id_permiso}`)),
+    [asignaciones]
+  );
 
   function abrirCreacion() {
     setRolEditando(null);
@@ -63,6 +64,7 @@ function RolesPage() {
     if (!window.confirm(`¿Eliminar el rol "${rol.nombre_rol}"?`)) return;
     try {
       await eliminar(rol.id_rol);
+      await recargarAsignaciones();
       setToast({ visible: true, mensaje: 'Rol eliminado exitosamente.', tipo: 'ok' });
     } catch (err) {
       setToast({ visible: true, mensaje: err.response?.data?.error || 'No fue posible eliminar el rol.', tipo: 'error' });
@@ -73,15 +75,8 @@ function RolesPage() {
     e.preventDefault();
     try {
       await api.post('/roles/asignar-permiso', permisoForm);
+      await recargarAsignaciones();
       setToast({ visible: true, mensaje: 'Permiso asignado exitosamente.', tipo: 'ok' });
-      const rolAfectado = roles.find((r) => r.codigo_rol === permisoForm.codigo_rol);
-      if (rolAfectado) {
-        setPermisosPorRol((prev) => {
-          const copia = { ...prev };
-          delete copia[rolAfectado.id_rol];
-          return copia;
-        });
-      }
       setPermisoForm({ codigo_rol: '', codigo_permiso: '' });
     } catch (err) {
       setToast({ visible: true, mensaje: err.response?.data?.error || 'No fue posible asignar el permiso.', tipo: 'error' });
@@ -92,42 +87,14 @@ function RolesPage() {
     e.preventDefault();
     try {
       await api.put('/roles/revocar-permiso', permisoForm);
+      await recargarAsignaciones();
       setToast({ visible: true, mensaje: 'Permiso revocado exitosamente.', tipo: 'ok' });
-      const rolAfectado = roles.find((r) => r.codigo_rol === permisoForm.codigo_rol);
-      if (rolAfectado) {
-        setPermisosPorRol((prev) => {
-          const copia = { ...prev };
-          delete copia[rolAfectado.id_rol];
-          return copia;
-        });
-      }
     } catch (err) {
       setToast({ visible: true, mensaje: err.response?.data?.error || 'No fue posible revocar el permiso.', tipo: 'error' });
     }
   }
 
-  async function alternarExpansion(rol) {
-    const id = rol.id_rol;
-    if (rolExpandidoId === id) {
-      setRolExpandidoId(null);
-      return;
-    }
-    setRolExpandidoId(id);
-    if (permisosPorRol[id]) return;
-
-    setCargandoPermisos(true);
-    setErrorPermisos(null);
-    try {
-      const { data } = await consultarPermisosDeRol(id);
-      setPermisosPorRol((prev) => ({ ...prev, [id]: data }));
-    } catch (err) {
-      setErrorPermisos(err.response?.data?.error || 'No fue posible cargar los permisos de este rol.');
-    } finally {
-      setCargandoPermisos(false);
-    }
-  }
-
-  const columnas = [
+  const columnasRoles = [
     {
       clave: 'nombre_rol',
       encabezado: 'Rol',
@@ -140,17 +107,51 @@ function RolesPage() {
       encabezado: '',
       render: (r) => (
         <div className="d-flex gap-1">
-          <IconButton
-            icono={rolExpandidoId === r.id_rol ? 'bi-chevron-up' : 'bi-chevron-down'}
-            titulo="Ver permisos"
-            onClick={() => alternarExpansion(r)}
-          />
           <IconButton icono="bi-pencil" titulo="Editar" onClick={() => abrirEdicion(r)} />
           <IconButton icono="bi-trash" titulo="Eliminar" onClick={() => manejarEliminar(r)} />
         </div>
       ),
     },
   ];
+
+  // Matriz: una fila por permiso, una columna por rol.
+  const columnasMatriz = [
+    {
+      clave: 'nombre_permiso',
+      encabezado: 'Permiso',
+      render: (f) => f.esModulo
+        ? <strong style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#4A90D9' }}>
+            {f.nombre_modulo}
+          </strong>
+        : <span style={{ paddingLeft: '12px' }}>{f.nombre_permiso}</span>,
+    },
+    ...roles.map((r) => ({
+      clave: `rol_${r.id_rol}`,
+      encabezado: r.nombre_rol,
+      render: (f) =>
+        !f.esModulo && asignado.has(`${r.id_rol}-${f.id_permiso}`) ? (
+          <i
+            className="bi bi-circle-fill"
+            style={{ color: '#4AC78B', fontSize: '0.6rem' }}
+            title={`${r.nombre_rol}: ${f.nombre_permiso}`}
+            aria-label="Permiso asignado"
+          />
+        ) : null,
+    })),
+  ];
+
+  const filasMatriz = useMemo(() => {
+    const filas = [];
+    let moduloActual = null;
+    permisos.forEach((p) => {
+      if (p.id_modulo !== moduloActual) {
+        moduloActual = p.id_modulo;
+        filas.push({ clave_fila: `mod-${p.id_modulo}`, esModulo: true, nombre_modulo: p.nombre_modulo });
+      }
+      filas.push({ ...p, clave_fila: `perm-${p.id_permiso}` });
+    });
+    return filas;
+  }, [permisos]);
 
   return (
     <div>
@@ -161,44 +162,15 @@ function RolesPage() {
 
       {error && <div className="alert alert-danger py-2">{error}</div>}
 
-      <DataTable
-        columnas={columnas}
-        filas={roles}
-        claveFila="id_rol"
-        filaExpandida={(r) => r.id_rol === rolExpandidoId}
-        renderExpandido={(r) => {
-          if (cargandoPermisos && !permisosPorRol[r.id_rol]) {
-            return (
-              <div className="d-flex align-items-center gap-2 text-muted" style={{ fontSize: '0.8rem' }}>
-                <Spinner animation="border" size="sm" /> Cargando permisos…
-              </div>
-            );
-          }
-          if (errorPermisos) {
-            return <div className="text-danger" style={{ fontSize: '0.8rem' }}>{errorPermisos}</div>;
-          }
-          const permisosDelRol = permisosPorRol[r.id_rol] || [];
-          if (permisosDelRol.length === 0) {
-            return <div className="text-muted" style={{ fontSize: '0.8rem' }}>Este rol no tiene permisos asignados.</div>;
-          }
-          return (
-            <div className="d-flex flex-wrap gap-2">
-              {permisosDelRol.map((p) => (
-                <span
-                  key={p.id_permiso_rol}
-                  className="badge"
-                  style={{ backgroundColor: '#1E2A38', color: '#CDD6E4', fontWeight: 500, fontSize: '0.72rem' }}
-                >
-                  {p.nombre_permiso}
-                </span>
-              ))}
-            </div>
-          );
-        }}
-      />
+      <DataTable columnas={columnasRoles} filas={roles} claveFila="id_rol" />
 
       <div className="mt-4">
-        <h6 className="text-uppercase" style={{ letterSpacing: '0.06em' }}>Permisos por rol</h6>
+        <h6 className="text-uppercase mb-3" style={{ letterSpacing: '0.06em' }}>Matriz de permisos por rol</h6>
+        <DataTable columnas={columnasMatriz} filas={filasMatriz} claveFila="clave_fila" />
+      </div>
+
+      <div className="mt-4">
+        <h6 className="text-uppercase" style={{ letterSpacing: '0.06em' }}>Asignar o revocar permiso</h6>
         <form className="d-flex gap-2 flex-wrap align-items-end">
           <div>
             <label className="form-label">Rol</label>

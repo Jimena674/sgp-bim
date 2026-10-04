@@ -17,6 +17,21 @@ export function AuthProvider({ children }) {
         setCargando(false);
     }, []);
 
+    useEffect(() => {
+        if (!usuario) return;
+
+        // El 401 lo gestiona el interceptor de api.js (guarda el mensaje y redirige).
+        const verificar = () => { api.get('/auth/sesion').catch(() => {}); };
+
+        const intervalo = setInterval(verificar, 10000);
+        window.addEventListener('focus', verificar);
+
+        return () => {
+            clearInterval(intervalo);
+            window.removeEventListener('focus', verificar);
+        };
+    }, [usuario]);
+
     const login = async (numero_id, password) => {
         const {data} = await api.post('/auth/login', {
             numero_id, password

@@ -52,6 +52,13 @@ class Sesion {
         return ejecutarConsultaPaginada(pool, queryDatos, queryConteo, params, tamano, offset);
     }
 
+    static async buscarPorJti(jwt_id){
+        const [filas] = await pool.query(
+            'SELECT s.*, e.codigo_estado FROM sesiones s INNER JOIN estados e ON e.id_estado = s.id_estado WHERE s.jwt_id = ?',
+            [jwt_id]
+        );
+        return filas[0];
+    }    
 };
 
 module.exports = Sesion;

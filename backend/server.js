@@ -7,13 +7,15 @@ const rolRoutes = require('./src/routes/rolRoutes');
 const sesionRoutes = require('./src/routes/sesionRoutes');
 const permisoRoutes = require('./src/routes/permisoRoutes');
 const cors = require('cors');
+const tipoRoutes = require('./src/routes/tipoRoutes');
+const moduloRoutes = require('./src/routes/moduloRoutes');
+
+const app = express();
 
 app.use(cors({
     origin: 'http://localhost:5173',
     credentials: true
 }));
-
-const app = express();
 
 app.use(express.json());
 
@@ -21,6 +23,8 @@ app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/roles', rolRoutes);
 app.use('/api/auth', sesionRoutes);
 app.use('/api/permisos', permisoRoutes);
+app.use('/api/tipos', tipoRoutes);
+app.use('/api/modulos', moduloRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

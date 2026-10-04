@@ -38,11 +38,23 @@ class Rol {
     }
 
     static async eliminar (id) {
-        await pool.query('DELETE FROM roles WHERE id_rol = ?', [id]);
+        const conexion = await pool.getConnection();
+        try {
+            await conexion.beginTransaction();
+            await conexion.query('DELETE FROM permisos_roles WHERE id_rol = ?', [id]);
+            await conexion.query('DELETE FROM roles_usuarios WHERE id_rol = ? AND activo = 0', [id]);
+            await conexion.query('DELETE FROM roles WHERE id_rol = ?', [id]);
+            await conexion.commit();
+        } catch (error) {
+            await conexion.rollback();
+            throw error;
+        } finally {
+            conexion.release();
+        }
     }
 
     static async contarUsuariosAsociados (id) {
-        const [filas] = await pool.query('SELECT COUNT(*) AS total FROM roles_usuarios WHERE id_rol = ?', [id]);
+        const [filas] = await pool.query('SELECT COUNT(*) AS total FROM roles_usuarios WHERE id_rol = ? AND activo = TRUE', [id]);
         return filas[0].total;
     }
 

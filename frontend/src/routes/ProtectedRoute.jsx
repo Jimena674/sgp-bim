@@ -7,7 +7,7 @@ function ProtectedRoute({children}) {
     if(cargando) return <div> Cargando...</div>;
 
     if(!usuario) {
-        return <Navigate to='/login' replace />;
+        return <Navigate to='/login' replace state={{ mensaje: 'Token no proporcionado.' }} />;
     }
 
     return children;

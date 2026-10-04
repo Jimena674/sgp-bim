@@ -5,6 +5,7 @@ import LoginPage from '../pages/auth/LoginPage';
 import UsuariosPage from '../pages/usuarios/UsuariosPage';
 import RolesPage from '../pages/roles/RolesPage';
 import AccesosPage from '../pages/accesos/AccesosPage';
+import TiposPage from '../pages/configuracion/TiposPage';
 
 function AppRoutes(){
     return(
@@ -38,6 +39,14 @@ function AppRoutes(){
                 }/>
 
                 <Route path="*" element={<Navigate to="/usuarios" replace />} />
+
+                <Route path="/configuracion/tipos" element={
+                    <ProtectedRoute>
+                        <AppLayout titulo="Tipos" breadcrumb="Sistema / Configuración / Tipos">
+                            <TiposPage />
+                        </AppLayout>
+                    </ProtectedRoute>
+                }/>
                 
             </Routes>
         </BrowserRouter>
