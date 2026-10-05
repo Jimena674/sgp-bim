@@ -9,6 +9,7 @@ const permisoRoutes = require('./src/routes/permisoRoutes');
 const cors = require('cors');
 const tipoRoutes = require('./src/routes/tipoRoutes');
 const moduloRoutes = require('./src/routes/moduloRoutes');
+const actividadRoutes = require('./src/routes/actividadRoutes');
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/api/auth', sesionRoutes);
 app.use('/api/permisos', permisoRoutes);
 app.use('/api/tipos', tipoRoutes);
 app.use('/api/modulos', moduloRoutes);
+app.use('/api/actividades', actividadRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
