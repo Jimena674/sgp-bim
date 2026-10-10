@@ -6,6 +6,7 @@ import UsuariosPage from '../pages/usuarios/UsuariosPage';
 import RolesPage from '../pages/roles/RolesPage';
 import AccesosPage from '../pages/accesos/AccesosPage';
 import TiposPage from '../pages/configuracion/TiposPage';
+import ActividadesPage from '../pages/actividades/ActividadesPage';
 
 function AppRoutes(){
     return(
@@ -34,6 +35,14 @@ function AppRoutes(){
                     <ProtectedRoute>
                         <AppLayout titulo="Control de acceso" breadcrumb="Administración / Control de acceso">
                             <AccesosPage />
+                        </AppLayout>
+                    </ProtectedRoute>
+                }/>
+                
+                <Route path="/actividades" element={
+                    <ProtectedRoute>
+                        <AppLayout titulo="Actividades" breadcrumb="Catálogos / Actividades">
+                            <ActividadesPage />
                         </AppLayout>
                     </ProtectedRoute>
                 }/>
