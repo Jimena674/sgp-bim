@@ -1,6 +1,10 @@
 const mysql = require('mysql2/promise');
 require('dotenv').config();
 
+const certificado = process.env.DB_CA_CERT
+    ? process.env.DB_CA_CERT.replace(/\\n/g, '\n')
+    : null;
+
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
     user:process.env.DB_USER,
@@ -9,6 +13,7 @@ const pool = mysql.createPool({
     port: process.env.DB_PORT,
     waitForConnections: true,
     connectionLimit: 10,
+    ssl: certificado ? { ca: certificado } : undefined
 })
 
 module.exports = pool;
